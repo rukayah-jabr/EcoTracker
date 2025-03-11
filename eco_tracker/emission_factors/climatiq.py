@@ -13,6 +13,8 @@ class EmissionFactorInfo:
     unit: str
     source_lca_activity: str
     data_version: str
+    name: str
+    description: str
 
 @dataclass
 class EmissionFactor:
@@ -72,7 +74,9 @@ class Climatiq:
             unit_type=best_matching_factor['unit_type'],
             unit=best_matching_factor['unit'],
             source_lca_activity=best_matching_factor['source_lca_activity'],
-            data_version=data_version
+            data_version=data_version,
+            name=best_matching_factor['name'],
+            description=best_matching_factor['description']
         )
 
     def fetch_emission_factor(self, ef_info: EmissionFactorInfo) -> EmissionFactor:

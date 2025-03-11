@@ -25,6 +25,8 @@ def emission_factor_info():
         unit='kg/cad',
         source_lca_activity='cradle_to_gate',
         data_version='^20',
+        name='Air purification',
+        description='Air purification'
     )
 
 def test_fetch_emission_factor_info_not_found(climatiq_instance):
@@ -39,6 +41,12 @@ def test_fetch_emission_factor_info_success(climatiq_instance):
     assert best_matching_factor.unit is not None
     assert best_matching_factor.source_lca_activity is not None
     assert best_matching_factor.data_version is not None
+    assert best_matching_factor.name is not None
+    assert best_matching_factor.description is not None
+
+def test_fetch_emission_factor_info_success_another(climatiq_instance):
+    best_matching_factor = climatiq_instance.fetch_emission_factor_info(query="laptop")
+    assert best_matching_factor.activity_id is not None
 
 def test_fetch_emission_factor_factor_not_found(climatiq_instance, emission_factor_info):
     emission_factor_info.activity_id = 'not-correct'
