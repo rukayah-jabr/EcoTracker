@@ -1,9 +1,9 @@
-import eco_tracker.emission_factors.climatiq as climatiq
-
 import os
+
 import pytest
 from dotenv import load_dotenv
 
+import eco_tracker.emission_factors.climatiq as climatiq
 from eco_tracker.emission_factors.exceptions import EmissionFactorNotFound
 
 
@@ -58,3 +58,9 @@ def test_fetch_emission_factor_factor_not_found(climatiq_instance, emission_fact
 def test_fetch_emission_factor_success(climatiq_instance, emission_factor_info):
     emission_factor = climatiq_instance.fetch_emission_factor(emission_factor_info)
     assert emission_factor.co2e is not None
+
+def test_fetch_emission_factor_from_query_success(climatiq_instance):
+    emission_factor = climatiq_instance.fetch_emission_factor_from_query(query="air purification", data_version="^20")
+    assert emission_factor.co2e is not None
+    assert emission_factor.co2e_unit is not None
+    assert emission_factor.activity_unit is not None
