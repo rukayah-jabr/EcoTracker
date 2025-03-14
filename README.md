@@ -4,10 +4,12 @@
 
 ### Prerequisites
 - Python 3.13
-- get API Key from Climatiq
+- get API Key from Climatiq - emission factors
   - [climatiq](https://www.climatiq.io/)
-- get API Key from 
+- get API Key from - distance calculation
   - [openrouteservice](https://openrouteservice.org/)
+- get API Key from Groq - LLM for categorization
+  - [groq](https://console.groq.com/keys)
 
 ### Create a `.env` file
 - copy the `.env.example` file and rename it to `.env`
@@ -26,3 +28,9 @@ pip install -r requirements.txt
 ```
 
 **Everything should work fine now!**
+
+## Adding dependencies
+When a new dependency is installed using pip, make sure to update the `requirements.txt` file by running the following command:
+```bash
+pip freeze > requirements.txt
+```
