@@ -1,8 +1,8 @@
 import requests
 from dataclasses import dataclass
 
-from .exceptions import EmissionFactorInfoNotFound
-from .unit import return_unit
+from eco_tracker.emission_factors.exceptions import EmissionFactorInfoNotFound
+from eco_tracker.emission_factors.unit import return_unit
 from eco_tracker.emission_factors import exceptions
 
 @dataclass
