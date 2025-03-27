@@ -3,9 +3,10 @@ from http import HTTPStatus
 import requests
 
 from eco_tracker import exceptions
+from eco_tracker.categorization.categorizer_interface import Categorizer
 
 
-class ClimatiqCategorization:
+class ClimatiqCategorizer(Categorizer):
 	def __init__(self, llm_api_key: str):
 		self.llm_api_key = llm_api_key
 
@@ -17,8 +18,9 @@ class ClimatiqCategorization:
 		content = f"""
 				I have a product called ${product}.
 				I need to match it with an emission factor from a database (climatiq.io), but exact matches are rare.
-				Please provide ${num_of_categories} different, concise terms (1-3 words each) that broadly describe the product,
+				Please provide ${num_of_categories} different, concise terms (from 1 word to 3 words each) that broadly describe the product,
 				avoiding excessive repetition of the same key terms.
+				If the word is general enough, like "laptop" or "car", you can return one key word a it is.
 				Terms must be in english and lowercase.
 				Just return the terms in a enumerated list (1., 2., 3. and so on).
 				Every entry must be in a new line.

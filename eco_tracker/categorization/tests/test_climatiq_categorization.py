@@ -12,8 +12,8 @@ def api_key() -> str:
     return os.getenv("LLM_API_KEY")
 
 @pytest.fixture
-def llm_client(api_key) -> categorization.ClimatiqCategorization:
-    return categorization.ClimatiqCategorization(llm_api_key=api_key)
+def llm_client(api_key) -> categorization.ClimatiqCategorizer:
+    return categorization.ClimatiqCategorizer(llm_api_key=api_key)
 
 def test_generate_categorization_success(llm_client):
     num_of_categories = 15

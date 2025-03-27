@@ -5,6 +5,9 @@ from eco_tracker.emission_factors.exceptions import EmissionFactorInfoNotFound
 from eco_tracker.emission_factors.unit import return_unit
 from eco_tracker.emission_factors import exceptions
 
+from eco_tracker.emission_factors.emission_factors_interface import EmissionFactor, EmissionFactorsFetcher
+
+
 @dataclass
 class EmissionFactorInfo:
     activity_id: str
@@ -15,13 +18,6 @@ class EmissionFactorInfo:
     data_version: str
     name: str
     description: str
-
-@dataclass
-class EmissionFactor:
-    co2e: float
-    co2e_unit: str
-    activity_unit: str
-
 
 def set_correct_unit_in_req_body(unit_type: str, req_body: dict):
     unit = return_unit(unit_type)
@@ -36,6 +32,9 @@ def get_our_activity_unit(unit_type: str) -> str:
     activity_unit = ""
 
     unit = return_unit(unit_type)
+    if len(unit) < 1:
+        return ""
+
     last_key = list(unit.keys())[-1]
     for key, value in unit.items():
         activity_unit += value
@@ -45,7 +44,7 @@ def get_our_activity_unit(unit_type: str) -> str:
 
     return activity_unit
 
-class Climatiq:
+class Climatiq(EmissionFactorsFetcher):
     def __init__(self, api_key: str):
         self.api_key = api_key
 
@@ -104,3 +103,11 @@ class Climatiq:
             co2e_unit=response_json['co2e_unit'],
             activity_unit=get_our_activity_unit(ef_info.unit_type),
         )
+
+    def fetch_emission_factor_from_query(self, query, data_version = '^20') -> EmissionFactor:
+        try:
+            ef_info = self.fetch_emission_factor_info(query, data_version)
+        except exceptions.EmissionFactorInfoNotFound:
+            raise exceptions.EmissionFactorNotFound(query)
+
+        return self.fetch_emission_factor(ef_info)

@@ -19,3 +19,7 @@ def return_unit(unit_type: str) -> dict[str, str] | None:
 			return {
 				'distance_unit': 'km'
 			}
+		case "number":
+			return {}
+
+	raise NotImplementedError
