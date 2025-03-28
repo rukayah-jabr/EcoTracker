@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from eco_tracker.erp_integration.fetch_data_interface import Data, DataFetcher
 from eco_tracker.erp_integration.fetch_data_filter import FetchDataFilter
 from eco_tracker.erp_integration.odoo import Odoo
+
 from eco_tracker.categorization.categorizer_interface import Categorizer
 from eco_tracker.categorization.climatiq_categorization import ClimatiqCategorizer
 from eco_tracker.categorization.climatiq_categorization_filter import ClimatiqCategorizerFilter
@@ -17,7 +18,6 @@ from eco_tracker.pipeline import Pipeline
 load_dotenv()
 CLIMATIQ_API_KEY=os.getenv("CLIMATIQ_API_KEY")
 LLM_API_KEY=os.getenv("LLM_API_KEY")
-
 
 def main():
 
@@ -70,7 +70,6 @@ def main():
     #     emission_factor=None,
     #     co2e=0,
     # )
-
     # pipeline(product)
 
     # print(product.climatiq_categories)

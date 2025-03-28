@@ -1,6 +1,8 @@
 import os
+
 from dotenv import load_dotenv
-from .climatiq import Climatiq
+
+from eco_tracker.emission_factors.climatiq import Climatiq
 
 if __name__ == "__main__":
     load_dotenv()
