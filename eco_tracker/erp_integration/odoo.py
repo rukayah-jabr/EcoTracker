@@ -1,5 +1,4 @@
 import json
-import pandas as pd
 from dotenv import load_dotenv
 import os
 import requests
@@ -73,14 +72,14 @@ class Odoo(DataFetcher):
             print(f"Request failed: {err}")
 
     # !! Does not completely work yet !!
-    def get_supplier_address(self, supplier_id) -> list:
+    def get_supplier_address(self, supplier_id: int) -> list:
         url = self.api_base_url + "/web/dataset/call_kw/res.partner/search_read"
         data = {
             "jsonrpc": "2.0",
             "params": {
                 "model": "res.partner",
                 "method": "search_read",
-                "args": [[]], # TO DO: get this filter to work returning a single id as argument
+                "args": [[["ref", "=", supplier_id]]], # TO DO: get this filter to work returning a single id as argument
                 "kwargs": {
                     "fields": ["name", "street", "zip", "city", "country_id"],
                 },
