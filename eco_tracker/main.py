@@ -39,17 +39,17 @@ def main():
     # TODO: adapt the FetchDataFilter to work within the pipeline?
     # TODO: standardize the data schema in odoo.fetch_data_from_source
     for index, item in enumerate(OdooData.data):
-        if index == 10: # limit to 10 for testing purposes
+        if index == 1: # limit to 10 for testing purposes
             break
 
         product = Product(
-            description=item['name'],
-            unit="unit",
-            quantity=item['product_uom_qty'],
-            price=item['price_unit'],
+            description=item.description,
+            unit=item.unit,
+            quantity=item.quantity,
+            price=item.unit_price,
             status="status",
             climatiq_categories=[],
-            category="category",
+            category=None,
             emission_factor=None,
             co2e=0,
         )

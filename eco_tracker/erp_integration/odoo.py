@@ -2,9 +2,10 @@ import json
 from dotenv import load_dotenv
 import os
 import requests
+from datetime import date
 
 from eco_tracker.erp_integration.fetch_data_interface import DataFetcher, Data
-from eco_tracker.erp_integration import exceptions
+from eco_tracker.erp_integration import exceptions, standardize
 
 load_dotenv()
 
@@ -51,7 +52,7 @@ class Odoo(DataFetcher):
                 "method": "search_read",
                 "args": [[]],
                 "kwargs": {
-                    "fields": ["date", "partner_id", "name", "product_uom_qty", "price_unit"],
+                    "fields": ["date", "partner_id", "name", "product_uom", "product_uom_qty", "price_unit"],
                 },
                 "context": {
                     "session_id": self.session_id
@@ -105,10 +106,40 @@ class Odoo(DataFetcher):
         self.authenticate()
 
         # Initialize empty data object
-        data = Data("odoo", {})
+        data = Data("odoo", [])
 
         # Get data
-        data.data = self.get_items()
+        results = self.get_items()
 
-        # TODO: standardize data to match product schema
+        # Standardize data to match product schema
+        for item in results:
+
+            # Clean address
+            address = self.get_supplier_address(item['id'])
+            address = address[0]
+            standardized_address = standardize.SupplierAddress(
+                street = address['street'],
+                city = address['city'],
+                state = None,
+                zip = address['zip'],
+                country = address['country_id']
+            )
+
+            standardized_item = standardize.ProductPurchase(
+                    delivered_date= item['date'],
+                    description= item['name'],
+                    unit= item['product_uom'],
+                    quantity= item['product_uom_qty'],
+                    unit_price= item['price_unit'],
+                    supplier= item['partner_id'][1],
+                    supplier_address= standardized_address
+                )
+            data.data.append(standardized_item)
+
         return data
+
+# TESTING  
+# odoo = Odoo()
+# results = odoo.fetch_data_from_source()
+# test = results[0]
+# print(test.description)
