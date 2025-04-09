@@ -36,10 +36,10 @@ def main():
     OdooData()
 
     # Run pipline over each item in data
-    # TO DO: adapt the FetchDataFilter to work within the pipeline?
-    # TO DO: standardize the data schema in odoo.fetch_data_from_source
+    # TODO: adapt the FetchDataFilter to work within the pipeline?
+    # TODO: standardize the data schema in odoo.fetch_data_from_source
     for index, item in enumerate(OdooData.data):
-        if index == 10:
+        if index == 10: # limit to 10 for testing purposes
             break
 
         product = Product(
@@ -58,22 +58,6 @@ def main():
         pipeline(product)
         print(product.climatiq_categories)
         print(product.emission_factor)
-
-    # product = Product(
-    #     description="Lenovo Yoga 15",
-    #     unit="unit",
-    #     quantity=1,
-    #     price=1000,
-    #     status="status",
-    #     climatiq_categories=[],
-    #     category="category",
-    #     emission_factor=None,
-    #     co2e=0,
-    # )
-    # pipeline(product)
-
-    # print(product.climatiq_categories)
-    # print(product.emission_factor)
 
 if __name__ == "__main__":
     main()

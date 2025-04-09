@@ -1,10 +1,10 @@
 import json
-import pandas as pd
 from dotenv import load_dotenv
 import os
 import requests
 
 from eco_tracker.erp_integration.fetch_data_interface import DataFetcher, Data
+from eco_tracker.erp_integration import exceptions
 
 load_dotenv()
 
@@ -31,18 +31,16 @@ class Odoo(DataFetcher):
                 "password": self.password
             }
         }
-        body = json.dumps(data)
 
-        try:
-            response = requests.post(url=url, headers=self.headers, data=body)
-            response.raise_for_status() # Raise HTTPError if not successful
-            
-            # Parse result and store the session_id
-            result = response.json()
-            self.session_id = result['result']['session_id']
-            print(f"Authenticated with session ID: {self.session_id}")
-        except requests.exceptions.HTTPError as err:
-            print(f"Authentication failed: {err}")
+        response = requests.post(url=url, headers=self.headers, json=data)
+
+        if not response.ok:
+            raise exceptions.AuthenticationFailed(url=url)
+        
+        # Parse result and store the session_id
+        result = response.json()
+        self.session_id = result['result']['session_id']
+        print(f"Authenticated with session ID: {self.session_id}")
 
     def get_items(self) -> list:
         url = self.api_base_url + "/web/dataset/call_kw/stock.move/search_read"
@@ -60,27 +58,25 @@ class Odoo(DataFetcher):
                 }
            }
         }
-        body = json.dumps(data)
 
-        try:
-            response = requests.post(url=url, headers=self.headers, data=body)
-            response.raise_for_status() # Raise HTTPError if not successful
-            
-            # Parse result and return list of delivered items
-            result = response.json()
-            return result['result']
-        except requests.exceptions.HTTPError as err:
-            print(f"Request failed: {err}")
+        response = requests.post(url=url, headers=self.headers, json=data)
+
+        if not response.ok:
+            raise exceptions.FetchingDataFailed(url=url)
+        
+        # Parse result and return list of delivered items
+        result = response.json()
+        return result['result']
 
     # !! Does not completely work yet !!
-    def get_supplier_address(self, supplier_id) -> list:
+    def get_supplier_address(self, supplier_id: int) -> list:
         url = self.api_base_url + "/web/dataset/call_kw/res.partner/search_read"
         data = {
             "jsonrpc": "2.0",
             "params": {
                 "model": "res.partner",
                 "method": "search_read",
-                "args": [[]], # TO DO: get this filter to work returning a single id as argument
+                "args": [[["id", "=", supplier_id]]], # TODO: get this filter to work returning a single id as argument
                 "kwargs": {
                     "fields": ["name", "street", "zip", "city", "country_id"],
                 },
@@ -89,17 +85,20 @@ class Odoo(DataFetcher):
                 }
            }
         }
-        body = json.dumps(data)
 
-        try:
-            response = requests.post(url=url, headers=self.headers, data=body)
-            response.raise_for_status() # Raise HTTPError if not successful
-            
-            # Parse result and return supplier location
-            result = response.json()
+        response = requests.post(url=url, headers=self.headers, json=data)
+
+        if not response.ok:
+            raise exceptions.FetchingDataFailed(url=url)
+        
+        # Parse result and return supplier location
+        result = response.json()
+        supplier_address = result['result']
+
+        if len(supplier_address) > 0:
             return result['result']
-        except requests.exceptions.HTTPError as err:
-            print(f"Request failed: {err}")
+        else:
+            raise exceptions.SupplierNotFound(supplier_id)
 
     # Implemented function used in FetchDataFilter
     def fetch_data_from_source(self) -> Data:
@@ -111,6 +110,5 @@ class Odoo(DataFetcher):
         # Get data
         data.data = self.get_items()
 
-        # TO DO: standardize data to match product schema
+        # TODO: standardize data to match product schema
         return data
-
