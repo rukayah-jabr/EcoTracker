@@ -15,7 +15,6 @@ class BreactCategorizer(Categorizer):
 			"Content-Type": "application/json"
 		}
 
-	#todo: consider num_of_categories? maybe no need?
 	#implemet the method from interface	(Categorizer)
 	def generate_categorization(self, product: str, num_of_categories: int = 10) -> list:
 		api_url_post = 'https://api-os.breact.ai/api/v1/services/classifier/process'
@@ -63,11 +62,3 @@ class BreactCategorizer(Categorizer):
 		predicted_class = get_response_data['result']['class']
 		categories = [predicted_class]
 		return categories
-
-#todo: modify the method if multiclass is wished
-# def parse_generated_categories(llm_categories: str) -> list:
-# 	categories = []
-# 	for category in llm_categories.split("\n"):
-# 		without_enumeration = category.split(".")[1].strip()
-# 		categories.append(without_enumeration)
-# 	return categories
