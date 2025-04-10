@@ -59,6 +59,14 @@ class BreactCategorizer(Categorizer):
 			raise exceptions.HTTPException(response_get.status_code, response_get.text)
 
 		get_response_data = response_get.json()
-		predicted_class = get_response_data['result']['class']
-		categories = [predicted_class]
+		confidence = get_response_data['result']['confidence']
+
+		#confidence threshold 0.7
+		if confidence < 0.7:
+			categories = ["others"]  #todo: probably will be changed
+
+		else:
+			predicted_class = get_response_data['result']['class']
+			categories = [predicted_class]
+
 		return categories
