@@ -29,12 +29,29 @@ def get_route_distance(start, end):
     except Exception as e:
         print("Error:", e)
         return None
+    
+def get_location_coordinates(address):
+    """
+    Returns the coordinates of a given address
+
+    :param address: String for the address
+    :return: List of coordinates, latitude and longitude
+    """
+    try:
+        geocode = client.pelias_search(text=address)
+        coords = geocode['features'][0]['geometry']['coordinates']
+        return coords
+    except Exception as e:
+        print("Error:", e)
+        return None
 
 
-# Example: Berlin to Munich
-start_coords = (13.4050, 52.5200)  # Berlin
-end_coords = (11.5820, 48.1351)  # Munich
+# Example
+# start_coords = get_location_coordinates("Mitterfeldstraße 7, Amstetten, None 3300 AT") # Supplier address
+# end_coords = get_location_coordinates("Stadtwerkestr. 2 Amstetten 3300 AT")  # Amstetten Stadtwerke address
 
-distance = get_route_distance(start_coords, end_coords)
-if distance:
-    print(f"The distance is approximately {distance:.2f} km")
+# if start_coords and end_coords:
+#     distance = get_route_distance(start_coords, end_coords)
+
+# if distance:
+#     print(f"The distance is approximately {distance:.2f} km")

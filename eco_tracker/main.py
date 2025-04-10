@@ -37,9 +37,9 @@ def main():
 
     # Run pipline over each item in data
     # TODO: adapt the FetchDataFilter to work within the pipeline?
-    # TODO: standardize the data schema in odoo.fetch_data_from_source
+
     for index, item in enumerate(OdooData.data):
-        if index == 1: # limit to 10 for testing purposes
+        if index == 5: # limit for testing purposes
             break
 
         product = Product(
@@ -48,6 +48,8 @@ def main():
             quantity=item.quantity,
             price=item.unit_price,
             status="status",
+            supplier=item.supplier,
+            supplier_address=item.supplier_address,
             climatiq_categories=[],
             category=None,
             emission_factor=None,
@@ -56,8 +58,16 @@ def main():
 
         # Run pipeline
         pipeline(product)
+
+        # show returned categories and emissions factors
         print(product.climatiq_categories)
         print(product.emission_factor)
+
+        # show cleaned supplier addresses and get distance calculation
+        print(product.supplier_address)
+        print(f"{product.supplier_address.get_distance_from_delivery_address(odoo.delivery_address)}km")
+        
+        print("==================")
 
 if __name__ == "__main__":
     main()

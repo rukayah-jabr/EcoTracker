@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 from eco_tracker.emission_factors.emission_factors_interface import EmissionFactor
+from eco_tracker.erp_integration.standardize import SupplierAddress
 
 # This is the element that is passed from one step to the next in the pipeline
 # TODO: Correct the types to the most specific ones e.g. status should be an enum
@@ -12,6 +13,8 @@ class Product:
 	quantity: float
 	price: int
 	status: str
+	supplier: str
+	supplier_address: SupplierAddress
 	# Data created by the pipeline
 	climatiq_categories: list[str]
 	category: str # TODO: Change to an enum

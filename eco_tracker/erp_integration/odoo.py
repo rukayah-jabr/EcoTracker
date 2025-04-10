@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import os
 import requests
 from datetime import date
+import re
 
 from eco_tracker.erp_integration.fetch_data_interface import DataFetcher, Data
 from eco_tracker.erp_integration import exceptions, standardize
@@ -15,6 +16,7 @@ class Odoo(DataFetcher):
         self.database = "ecotracker"
         self.username = 'admin'
         self.password = os.getenv("ODOO_PASSWORD")
+        self.delivery_address = "Stadtwerkestr. 2 Amstetten 3300 AT"
 
         # Odoo API request settings; session_id is provided from
         # successful authorization and is REQUIRED to make requests
@@ -118,7 +120,7 @@ class Odoo(DataFetcher):
             address = self.get_supplier_address(item['id'])
             address = address[0]
             standardized_address = standardize.SupplierAddress(
-                street = address['street'],
+                street = re.split(r'\s{2,}', address['street'])[1], # remove the company name from street address by splitting on 2+ spaces
                 city = address['city'],
                 state = None,
                 zip = address['zip'],
@@ -137,9 +139,3 @@ class Odoo(DataFetcher):
             data.data.append(standardized_item)
 
         return data
-
-# TESTING  
-# odoo = Odoo()
-# results = odoo.fetch_data_from_source()
-# test = results[0]
-# print(test.description)

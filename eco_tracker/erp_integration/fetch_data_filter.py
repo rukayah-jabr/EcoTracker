@@ -14,5 +14,5 @@ class FetchDataFilter:
             self.source = data.source
             self.data = data.data
         except:
-            # TO DO: create exception class
+            # TODO: create exception class
             print("Error fetching data from source")
