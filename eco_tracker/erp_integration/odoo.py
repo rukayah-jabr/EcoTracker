@@ -76,7 +76,7 @@ class Odoo(DataFetcher):
             "params": {
                 "model": "res.partner",
                 "method": "search_read",
-                "args": [[["id", "=", supplier_id]]], # TODO: get this filter to work returning a single id as argument
+                "args": [[["ref", "=", supplier_id]]],
                 "kwargs": {
                     "fields": ["name", "street", "zip", "city", "country_id"],
                 },
