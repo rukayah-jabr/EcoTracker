@@ -19,13 +19,13 @@ from eco_tracker.pipeline import Pipeline
 load_dotenv()
 CLIMATIQ_API_KEY=os.getenv("CLIMATIQ_API_KEY")
 LLM_API_KEY=os.getenv("LLM_API_KEY")
-BREACT_API_KEY=os.getenv("BREACT_API_KEY") #todo: add the api-key to the env file when we get the new one
+BREACT_API_KEY=os.getenv("BREACT_API_KEY")
 
 def main():
 
     odoo: DataFetcher = Odoo()
     groq_categorizer: Categorizer = ClimatiqCategorizer(LLM_API_KEY)
-    #breact_categorizer: Categorizer = BreactCategorizer(BREACT_API_KEY)
+    breact_categorizer: Categorizer = BreactCategorizer(BREACT_API_KEY)
     climatiq: EmissionFactorsFetcher = Climatiq(CLIMATIQ_API_KEY)
 
     # Define product pipeline
@@ -62,10 +62,9 @@ def main():
         print(product.climatiq_categories)
         print(product.emission_factor)
 
-        #todo: uncomment when we gain access again
         #a small try out for the breact categorizer
-        #breact_categories = breact_categorizer.generate_categorization(product.description)
-        #print(f"[Breact] Categorization for '{product.description}': {breact_categories[0]}")
+        breact_categories = breact_categorizer.generate_categorization(product.description)
+        print(f"[Breact] Categorization for '{product.description}': {breact_categories[0]}")
 
 if __name__ == "__main__":
     main()
