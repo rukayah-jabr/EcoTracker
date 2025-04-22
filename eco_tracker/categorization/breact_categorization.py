@@ -49,17 +49,13 @@ class BreactCategorizer(Categorizer):
 		access_token = post_response_data.get('access_token')
 		process_id = post_response_data.get('process_id')
 
-		#api needs time
-		time.sleep(5)
-
-		#make the get request
+		#the get request
 		get_url = f'{api_url_get}/{process_id}?access_token={access_token}'
-		response_get = requests.get(get_url, headers=self.headers)
-		if response_get.status_code != HTTPStatus.OK:
-			raise exceptions.HTTPException(response_get.status_code, response_get.text)
+		get_response_data = self._poll_for_result(get_url)
 
-		get_response_data = response_get.json()
-		confidence = get_response_data['result']['result']['confidence']
+		#extract confidence
+		inner_result = get_response_data.get('result', {}).get('result', {})
+		confidence = inner_result.get('confidence', 0)
 
 		#confidence threshold 0.7
 		if confidence < 0.7:
@@ -70,3 +66,15 @@ class BreactCategorizer(Categorizer):
 			categories = [predicted_class]
 
 		return categories
+
+	def _poll_for_result(self, url: str, timeout: int = 30, interval: int = 2) -> dict:
+		#Polls the GET endpoint
+		start_time = time.time()
+		while time.time() - start_time < timeout:
+			response = requests.get(url, headers=self.headers)
+			if response.status_code == HTTPStatus.OK:
+				data = response.json()
+				if 'result' in data and 'result' in data['result']:
+					return data
+			time.sleep(interval)
+		raise exceptions.HTTPException(504, "Timeout while polling for result.")
