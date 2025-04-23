@@ -14,6 +14,7 @@ from eco_tracker.product import Product
 from eco_tracker.emission_factors.climatiq import Climatiq
 from eco_tracker.emission_factors.emission_factors_interface import EmissionFactorsFetcher
 from eco_tracker.emission_factors.emission_factors_filter import EmissionFactorsFilter
+from eco_tracker.categorization.reorder_categorization import  CategoryReorderStep
 from eco_tracker.pipeline import Pipeline
 
 load_dotenv()
@@ -29,9 +30,9 @@ def main():
     climatiq: EmissionFactorsFetcher = Climatiq(CLIMATIQ_API_KEY)
 
     # Define product pipeline
-    #TODO: add a step for reordering
     pipeline = Pipeline[Product](
         ClimatiqCategorizerFilter(groq_categorizer),
+        CategoryReorderStep(breact_categorizer),
         EmissionFactorsFilter(climatiq, "^20"),
     )
 
@@ -60,7 +61,7 @@ def main():
 
         # Run pipeline
         pipeline(product)
-        print(product.climatiq_categories)
+        print(product.climatiq_categories) #this should be sorted now
         print(product.emission_factor)
 
         #a small try out for the breact categorizer
