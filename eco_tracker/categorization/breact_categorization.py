@@ -6,7 +6,6 @@ import requests
 from eco_tracker import exceptions
 from eco_tracker.categorization.categorizer_interface import Categorizer
 
-
 class BreactCategorizer(Categorizer):
 	def __init__(self, breact_api_key: str):
 		self.breact_api_key = breact_api_key
@@ -15,20 +14,40 @@ class BreactCategorizer(Categorizer):
 			"Content-Type": "application/json"
 		}
 
-	#implemet the method from interface	(Categorizer)
+	# implemet the method from interface (Categorizer)
 	def generate_categorization(self, product: str, num_of_categories: int = 10) -> list:
+		result = self._classify(product)
+		confidence = result.get("confidence", 0)
+
+		##confidence threshold 0.7
+		if confidence < 0.7:
+			return ["others"]
+		return [result.get("class", "others")]
+
+	#support function for determining best match
+	def get_confidence_for_class(self, product: str, category: str) -> float:
+		result = self._classify(product, allowed_classes=[category])
+		if result.get("class") != category:
+			return 0.0
+		return result.get("confidence", 0.0)
+
+	#actual call to API
+	def _classify(self, product: str, allowed_classes: list[str] = None) -> dict:
 		api_url_post = 'https://api-os.breact.ai/api/v1/services/classifier/process'
 		api_url_get = 'https://api-os.breact.ai/api/v1/services/result'
+
+		if allowed_classes is None: #in case of FE call
+			allowed_classes = [
+				"Haushaltsgeraete", "Kaffee & Zubehoer", "Reinigung & Waschmittel",
+				"Batterien & Akkus", "Beleuchtung", "Elektronik",
+				"Ersatzteile & Zubehoer", "Service", "Lieferservice", "Kuechengeraete"
+			]
 
 		request_data = {
 			"content": product,
 			"context": {
 				"classificationType": "products",
-				"allowedClasses": [
-					"Haushaltsgeraete", "Kaffee & Zubehoer", "Reinigung & Waschmittel",
-					"Batterien & Akkus", "Beleuchtung", "Elektronik",
-					"Ersatzteile & Zubehoer", "Service", "Lieferservice", "Kuechengeraete"
-				],
+				"allowedClasses": allowed_classes,
 				"multiClass": False
 			},
 			"config": {
@@ -38,37 +57,21 @@ class BreactCategorizer(Categorizer):
 			}
 		}
 
-		#make the post request
 		response_post = requests.post(api_url_post, json=request_data, headers=self.headers)
-
 		if response_post.status_code != HTTPStatus.OK:
 			raise exceptions.HTTPException(response_post.status_code, response_post.text)
 
-		#Parse response from post to extract access_token and process_id
+		# Parse response from post to extract access_token and process_id
 		post_response_data = response_post.json()
 		access_token = post_response_data.get('access_token')
 		process_id = post_response_data.get('process_id')
 
-		#the get request
 		get_url = f'{api_url_get}/{process_id}?access_token={access_token}'
 		get_response_data = self._poll_for_result(get_url)
 
-		#extract confidence
-		inner_result = get_response_data.get('result', {}).get('result', {})
-		confidence = inner_result.get('confidence', 0)
-
-		#confidence threshold 0.7
-		if confidence < 0.7:
-			categories = ["others"]  #fallback
-
-		else:
-			predicted_class = get_response_data['result']['result']['class']
-			categories = [predicted_class]
-
-		return categories
+		return get_response_data.get("result", {}).get("result", {})
 
 	def _poll_for_result(self, url: str, timeout: int = 30, interval: int = 2) -> dict:
-		#Polls the GET endpoint
 		start_time = time.time()
 		while time.time() - start_time < timeout:
 			response = requests.get(url, headers=self.headers)

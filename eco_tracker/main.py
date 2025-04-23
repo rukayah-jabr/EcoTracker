@@ -29,6 +29,7 @@ def main():
     climatiq: EmissionFactorsFetcher = Climatiq(CLIMATIQ_API_KEY)
 
     # Define product pipeline
+    #TODO: add a step for reordering
     pipeline = Pipeline[Product](
         ClimatiqCategorizerFilter(groq_categorizer),
         EmissionFactorsFilter(climatiq, "^20"),
@@ -65,6 +66,8 @@ def main():
         #a small try out for the breact categorizer
         breact_categories = breact_categorizer.generate_categorization(product.description)
         print(f"[Breact] Categorization for '{product.description}': {breact_categories[0]}")
+        breact_confidence = breact_categorizer.get_confidence_for_class(product.description, breact_categories[0])
+        print(f"[Breact] Conficende for '{breact_categories[0]}': {breact_confidence}")
 
 if __name__ == "__main__":
     main()
