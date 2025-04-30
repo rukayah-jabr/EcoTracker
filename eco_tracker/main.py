@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from eco_tracker.erp_integration.fetch_data_interface import Data, DataFetcher
 from eco_tracker.erp_integration.fetch_data_filter import FetchDataFilter
 from eco_tracker.erp_integration.odoo import Odoo
-
+from eco_tracker.distance_estimation.open_route_service import get_distance_from_delivery_address
 from eco_tracker.categorization.categorizer_interface import Categorizer
 from eco_tracker.categorization.climatiq_categorization import ClimatiqCategorizer
 from eco_tracker.categorization.climatiq_categorization_filter import ClimatiqCategorizerFilter
@@ -38,23 +38,9 @@ def main():
     # Run pipline over each item in data
     # TODO: adapt the FetchDataFilter to work within the pipeline?
 
-    for index, item in enumerate(OdooData.data):
+    for index, product in enumerate(OdooData.data):
         if index == 5: # limit for testing purposes
             break
-
-        product = Product(
-            description=item.description,
-            unit=item.unit,
-            quantity=item.quantity,
-            price=item.unit_price,
-            status="status",
-            supplier=item.supplier,
-            supplier_address=item.supplier_address,
-            climatiq_categories=[],
-            category=None,
-            emission_factor=None,
-            co2e=0,
-        )
 
         # Run pipeline
         pipeline(product)
@@ -65,7 +51,7 @@ def main():
 
         # show cleaned supplier addresses and get distance calculation
         print(product.supplier_address)
-        print(f"{product.supplier_address.get_distance_from_delivery_address(odoo.delivery_address)}km")
+        print(f"Distance: {get_distance_from_delivery_address(odoo.delivery_address, product.supplier_address)}km")
         
         print("==================")
 

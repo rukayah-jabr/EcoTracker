@@ -1,5 +1,6 @@
 from eco_tracker.erp_integration.fetch_data_interface import DataFetcher
 from eco_tracker.erp_integration.fetch_data_interface import Data
+from eco_tracker.erp_integration.exceptions import FetchingDataFailed
 
 class FetchDataFilter:
     def __init__(self, data_fetcher: DataFetcher):
@@ -14,5 +15,4 @@ class FetchDataFilter:
             self.source = data.source
             self.data = data.data
         except:
-            # TODO: create exception class
-            print("Error fetching data from source")
+            raise FetchingDataFailed(url=self.source)

@@ -1,12 +1,11 @@
-import json
 from dotenv import load_dotenv
 import os
 import requests
-from datetime import date
 import re
 
 from eco_tracker.erp_integration.fetch_data_interface import DataFetcher, Data
-from eco_tracker.erp_integration import exceptions, standardize
+from eco_tracker.erp_integration import exceptions
+from eco_tracker import product
 
 load_dotenv()
 
@@ -24,7 +23,7 @@ class Odoo(DataFetcher):
         self.api_base_url = 'http://localhost:8069'
         self.headers= {"Content-Type": "application/json"}
 
-    def authenticate(self):
+    def authenticate(self) -> bool:
         url = self.api_base_url + "/web/session/authenticate"
         data = {
             "jsonrpc": "2.0",
@@ -44,6 +43,7 @@ class Odoo(DataFetcher):
         result = response.json()
         self.session_id = result['result']['session_id']
         print(f"Authenticated with session ID: {self.session_id}")
+        return True
 
     def get_items(self) -> list:
         url = self.api_base_url + "/web/dataset/call_kw/stock.move/search_read"
@@ -71,7 +71,6 @@ class Odoo(DataFetcher):
         result = response.json()
         return result['result']
 
-    # !! Does not completely work yet !!
     def get_supplier_address(self, supplier_id: int) -> list:
         url = self.api_base_url + "/web/dataset/call_kw/res.partner/search_read"
         data = {
@@ -79,7 +78,7 @@ class Odoo(DataFetcher):
             "params": {
                 "model": "res.partner",
                 "method": "search_read",
-                "args": [[["id", "=", supplier_id]]], # TODO: get this filter to work returning a single id as argument
+                "args": [[["id", "=", supplier_id]]],
                 "kwargs": {
                     "fields": ["name", "street", "zip", "city", "country_id"],
                 },
@@ -102,6 +101,20 @@ class Odoo(DataFetcher):
             return result['result']
         else:
             raise exceptions.SupplierNotFound(supplier_id)
+        
+    def standardize_unit(self, unit_type: str) -> str | None:
+
+        match unit_type.upper():
+            case "STK":
+                return 'number'
+            case "LT":
+                return 'liter'
+            case "STD":
+                return 'hour'
+            case "PA":
+                return 'number'
+
+        raise NotImplementedError
 
     # Implemented function used in FetchDataFilter
     def fetch_data_from_source(self) -> Data:
@@ -119,7 +132,7 @@ class Odoo(DataFetcher):
             # Clean address
             address = self.get_supplier_address(item['id'])
             address = address[0]
-            standardized_address = standardize.SupplierAddress(
+            standardized_address = product.SupplierAddress(
                 street = re.split(r'\s{2,}', address['street'])[1], # remove the company name from street address by splitting on 2+ spaces
                 city = address['city'],
                 state = None,
@@ -127,14 +140,23 @@ class Odoo(DataFetcher):
                 country = address['country_id']
             )
 
-            standardized_item = standardize.ProductPurchase(
-                    delivered_date= item['date'],
-                    description= item['name'],
-                    unit= item['product_uom'],
-                    quantity= item['product_uom_qty'],
-                    unit_price= item['price_unit'],
-                    supplier= item['partner_id'][1],
-                    supplier_address= standardized_address
+            # Standarized unit
+            unit = self.standardize_unit(item['product_uom'])
+
+            standardized_item = product.Product(
+                    delivered_date = item['date'],
+                    description = item['name'],
+                    unit = unit,
+                    quantity = item['product_uom_qty'],
+                    price = item['price_unit'],
+                    supplier = item['partner_id'][1],
+                    supplier_address= standardized_address,
+                    climatiq_categories = [],
+                    category = None,
+                    emission_factor = None,
+                    delivery_distance = 0,
+                    co2e = 0,
+                    co2_transport = 0
                 )
             data.data.append(standardized_item)
 
