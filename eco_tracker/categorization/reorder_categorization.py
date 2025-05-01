@@ -16,7 +16,8 @@ class CategoryReorderStep:
         for category in product.climatiq_categories:
             try:
                 confidence = self.categorizer.get_confidence_for_class(product.description, category)
-                confidences[category] = confidence #assign dict
+                if confidence >= 0.7:  # confidence threshold = 0.7, anything lower is discarded
+                    confidences[category] = confidence
             except Exception:
                 confidences[category] = 0.0
 

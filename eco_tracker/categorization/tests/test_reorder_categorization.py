@@ -44,8 +44,8 @@ def test_category_reorder_step_reorders_by_confidence(mock_breact_categorizer):
 
     reorder_step(product, next_step)
 
-    # Check if categories were sorted by confidence (Elektronik > Haushaltsgeraete > Beleuchtung > Service)
-    assert product.climatiq_categories == ["Elektronik", "Haushaltsgeraete", "Beleuchtung", "Service"]
+    # Check if categories were sorted by confidence and categories below the threshold were discarded (Elektronik > Haushaltsgeraete), Beleuchtung and Service should be ignored
+    assert product.climatiq_categories == ["Elektronik", "Haushaltsgeraete"]
 
     # check if pipeline continues
     next_step.assert_called_once_with(product)

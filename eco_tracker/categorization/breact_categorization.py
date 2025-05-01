@@ -14,7 +14,7 @@ class BreactCategorizer(Categorizer):
 			"Content-Type": "application/json"
 		}
 
-	# implemet the method from interface (Categorizer)
+	# implement the method from interface (Categorizer)
 	def generate_categorization(self, product: str, num_of_categories: int = 10) -> list:
 		result = self._classify(product)
 		confidence = result.get("confidence", 0)
