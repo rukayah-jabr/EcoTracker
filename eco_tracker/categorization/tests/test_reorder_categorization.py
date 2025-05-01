@@ -5,6 +5,9 @@ from eco_tracker.product import Product
 from eco_tracker.categorization.breact_categorization import BreactCategorizer
 from eco_tracker.pipeline import NextStep
 from eco_tracker.categorization.reorder_categorization import CategoryReorderStep
+from eco_tracker.product import Product, SupplierAddress
+from datetime import date
+
 
 
 @pytest.fixture
@@ -21,15 +24,19 @@ def mock_breact_categorizer():
 
 def test_category_reorder_step_reorders_by_confidence(mock_breact_categorizer):
     product = Product(
+        delivered_date=date.today(),
         description="Smart LED lamp",
         unit="unit",
         quantity=1,
         price=19.99,
-        status="",
+        supplier="Test Supplier",
+        supplier_address=SupplierAddress("Test Street", "Test City", "Test State", "12345", "Test Country"),
         climatiq_categories=["Beleuchtung", "Elektronik", "Haushaltsgeraete", "Service"],
         category="",
         emission_factor=None,
-        co2e=0,
+        delivery_distance=0.0,
+        co2e=0.0,
+        co2_transport=0.0,
     )
 
     next_step = MagicMock()  # fake a call to check later
