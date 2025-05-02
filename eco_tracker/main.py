@@ -34,6 +34,7 @@ def main():
         ClimatiqCategorizerFilter(groq_categorizer),
         CategoryReorderStep(breact_categorizer),
         EmissionFactorsFilter(climatiq, "^20"),
+        # todo: breact  categorizer for determining product.category
     )
 
     # Get data
@@ -44,7 +45,7 @@ def main():
     # TODO: adapt the FetchDataFilter to work within the pipeline?
 
     for index, product in enumerate(OdooData.data):
-        if index == 5: # limit for testing purposes
+        if index == 2: # limit for testing purposes
             break
 
         # Run pipeline
