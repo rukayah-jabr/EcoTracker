@@ -21,7 +21,13 @@ def test_breact_generate_categorization_success(breact_client):
     categories = breact_client.generate_categorization(product=product)
 
     assert categories is not None
-    assert isinstance(categories, list) #still need to be checked if its really a list in case of single class
+    assert isinstance(categories, list)
     assert len(categories) == 1 #single class
     assert isinstance(categories[0], str) #checks if the content is string
     assert len(categories[0]) > 0 #empty string
+
+def test_breact_generate_categorization_low_confidence(breact_client):
+    product = "totally random input which should not match anything"
+    categories = breact_client.generate_categorization(product=product)
+
+    assert categories == ["others"]
