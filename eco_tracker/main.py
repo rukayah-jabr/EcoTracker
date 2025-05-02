@@ -9,6 +9,7 @@ from eco_tracker.distance_estimation.open_route_service import get_distance_from
 from eco_tracker.categorization.categorizer_interface import Categorizer
 from eco_tracker.categorization.climatiq_categorization import ClimatiqCategorizer
 from eco_tracker.categorization.climatiq_categorization_filter import ClimatiqCategorizerFilter
+from eco_tracker.categorization.breact_categorization import BreactCategorizer
 from eco_tracker.product import Product
 from eco_tracker.emission_factors.climatiq import Climatiq
 from eco_tracker.emission_factors.emission_factors_interface import EmissionFactorsFetcher
@@ -18,11 +19,13 @@ from eco_tracker.pipeline import Pipeline
 load_dotenv()
 CLIMATIQ_API_KEY=os.getenv("CLIMATIQ_API_KEY")
 LLM_API_KEY=os.getenv("LLM_API_KEY")
+BREACT_API_KEY=os.getenv("BREACT_API_KEY")
 
 def main():
 
     odoo: DataFetcher = Odoo()
     groq_categorizer: Categorizer = ClimatiqCategorizer(LLM_API_KEY)
+    breact_categorizer: Categorizer = BreactCategorizer(BREACT_API_KEY)
     climatiq: EmissionFactorsFetcher = Climatiq(CLIMATIQ_API_KEY)
 
     # Define product pipeline
@@ -48,6 +51,10 @@ def main():
         # show returned categories and emissions factors
         print(product.climatiq_categories)
         print(product.emission_factor)
+
+        #a small try out for the breact categorizer
+        breact_categories = breact_categorizer.generate_categorization(product.description)
+        print(f"[Breact] Categorization for '{product.description}': {breact_categories[0]}")
 
         # show cleaned supplier addresses and get distance calculation
         print(product.supplier_address)

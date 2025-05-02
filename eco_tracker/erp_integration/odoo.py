@@ -38,7 +38,7 @@ class Odoo(DataFetcher):
 
         if not response.ok:
             raise exceptions.AuthenticationFailed(url=url)
-        
+
         # Parse result and store the session_id
         result = response.json()
         self.session_id = result['result']['session_id']
@@ -66,7 +66,7 @@ class Odoo(DataFetcher):
 
         if not response.ok:
             raise exceptions.FetchingDataFailed(url=url)
-        
+
         # Parse result and return list of delivered items
         result = response.json()
         return result['result']
@@ -92,7 +92,7 @@ class Odoo(DataFetcher):
 
         if not response.ok:
             raise exceptions.FetchingDataFailed(url=url)
-        
+
         # Parse result and return supplier location
         result = response.json()
         supplier_address = result['result']
