@@ -2,7 +2,7 @@ import os
 import pytest
 from dotenv import load_dotenv
 
-from eco_tracker.categorization.breact_categorization import BreactCategorizer
+from eco_tracker.categorization.breact.breact_categorization import BreactCategorizer
 
 
 @pytest.fixture

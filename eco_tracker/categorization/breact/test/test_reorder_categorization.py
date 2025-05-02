@@ -3,9 +3,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from eco_tracker.categorization.breact_categorization import BreactCategorizer
-from eco_tracker.categorization.reorder_categorization import CategoryReorderStep
-from eco_tracker.pipeline import NextStep
+from eco_tracker.categorization.breact.breact_categorization import BreactCategorizer
+from eco_tracker.categorization.breact.breact_reorder_categorization import CategoryReorderStep
 from eco_tracker.product import Product, SupplierAddress
 
 

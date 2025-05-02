@@ -1,6 +1,6 @@
 from eco_tracker.product import Product
 from eco_tracker.pipeline import NextStep
-from eco_tracker.categorization.breact_categorization import BreactCategorizer
+from eco_tracker.categorization.breact.breact_categorization import BreactCategorizer
 
 
 class CategoryReorderStep:

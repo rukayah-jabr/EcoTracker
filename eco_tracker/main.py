@@ -2,11 +2,11 @@ import os
 
 from dotenv import load_dotenv
 
-from eco_tracker.categorization.breact_categorization import BreactCategorizer
+from eco_tracker.categorization.breact.breact_categorization import BreactCategorizer
 from eco_tracker.categorization.categorizer_interface import Categorizer
 from eco_tracker.categorization.climatiq_categorization_filter import ClimatiqCategorizerFilter
 from eco_tracker.categorization.groq.groq_categorizer import ClimatiqCategorizer
-from eco_tracker.categorization.reorder_categorization import CategoryReorderStep
+from eco_tracker.categorization.breact.breact_reorder_categorization import CategoryReorderStep
 from eco_tracker.distance_estimation.open_route_service import get_distance_from_delivery_address
 from eco_tracker.emission_factors.climatiq.climatiq import Climatiq
 from eco_tracker.emission_factors.emission_factors_filter import EmissionFactorsFilter
