@@ -1,4 +1,4 @@
-import eco_tracker.emission_factors.unit as unit
+import eco_tracker.emission_factors.climatiq.unit as unit
 
 def test_return_unit():
 	assert unit.return_unit("weight") == {'weight_unit': 'kg'}

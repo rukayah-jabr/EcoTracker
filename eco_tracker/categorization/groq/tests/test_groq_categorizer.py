@@ -3,8 +3,7 @@ import os
 import pytest
 from dotenv import load_dotenv
 
-import eco_tracker.categorization.climatiq_categorization as categorization
-
+import eco_tracker.categorization.groq.groq_categorizer as categorization
 
 @pytest.fixture
 def api_key() -> str:

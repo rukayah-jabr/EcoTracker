@@ -1,11 +1,12 @@
-from dotenv import load_dotenv
 import os
-import requests
 import re
 
-from eco_tracker.erp_integration.fetch_data_interface import DataFetcher, Data
-from eco_tracker.erp_integration import exceptions
+import requests
+from dotenv import load_dotenv
+
 from eco_tracker import product
+from eco_tracker.erp_integration import exceptions
+from eco_tracker.erp_integration.fetch_data_interface import Data, DataFetcher
 
 load_dotenv()
 
@@ -148,14 +149,15 @@ class Odoo(DataFetcher):
                     description = item['name'],
                     unit = unit,
                     quantity = item['product_uom_qty'],
-                    price = item['price_unit'],
+                    unit_price = item['price_unit'],
                     supplier = item['partner_id'][1],
                     supplier_address= standardized_address,
                     climatiq_categories = [],
+                    climatiq_matched_category = None,
                     category = None,
                     emission_factor = None,
                     delivery_distance = 0,
-                    co2e = 0,
+                    co2_purchase = 0,
                     co2_transport = 0
                 )
             data.data.append(standardized_item)

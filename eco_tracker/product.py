@@ -3,6 +3,7 @@ from datetime import date
 
 from eco_tracker.emission_factors.emission_factors_interface import EmissionFactor
 
+
 class SupplierAddress:
     def __init__(self, street: str, city: str, state:str, zip:str, country:str):
         self.street = street
@@ -23,15 +24,16 @@ class Product:
 	description: str
 	unit: str
 	quantity: float
-	price: float # TODO: change to 'unit_price'
+	unit_price: float
 	supplier: str
 	supplier_address: SupplierAddress
 	# Data created by the pipeline
 	climatiq_categories: list[str] # TODO: change name to 'estimate_categories'
-	category: str # TODO: Change to an enum and change name to 'display_category'
+	climatiq_matched_category: str | None # TODO: change name to 'estimate_matched_category'
+	category: str # TODO: Change to an enum
 	emission_factor: EmissionFactor
 	delivery_distance: float
-	co2e: float # TODO: change name to co2_purchase
+	co2_purchase: float
 	co2_transport: float
 
 

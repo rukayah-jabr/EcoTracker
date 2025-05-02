@@ -6,9 +6,11 @@ class EmissionFactor:
 	co2e: float
 	co2e_unit: str
 	activity_unit: str
+	name: str
+	description: str
 
 class EmissionFactorsFetcher(ABC):
 
 	@abstractmethod
-	def fetch_emission_factor_from_query(self, query: str, data_version: str) -> EmissionFactor:
+	def fetch_emission_factor_from_query(self, query: str, unit: str, data_version: str) -> EmissionFactor:
 		raise NotImplementedError()

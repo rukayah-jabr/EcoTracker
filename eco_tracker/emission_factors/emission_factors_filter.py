@@ -13,8 +13,9 @@ class EmissionFactorsFilter:
 	def __call__(self, product: Product, next_step: NextStep) -> None:
 		for category in product.climatiq_categories:
 			try:
-				emission_factor = self.emission_factors_fetcher.fetch_emission_factor_from_query(category, self.data_version)
+				emission_factor = self.emission_factors_fetcher.fetch_emission_factor_from_query(category, product.unit, self.data_version)
 				product.emission_factor = emission_factor
+				product.climatiq_matched_category = category
 				next_step(product)
 				return None
 			except EmissionFactorNotFound:

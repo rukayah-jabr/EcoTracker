@@ -1,11 +1,11 @@
-import requests
 from dataclasses import dataclass
 
-from eco_tracker.emission_factors.exceptions import EmissionFactorInfoNotFound
-from eco_tracker.emission_factors.unit import return_unit
-from eco_tracker.emission_factors import exceptions
+import requests
 
+from eco_tracker.emission_factors import exceptions
+from eco_tracker.emission_factors.climatiq.unit import return_unit
 from eco_tracker.emission_factors.emission_factors_interface import EmissionFactor, EmissionFactorsFetcher
+from eco_tracker.emission_factors.exceptions import EmissionFactorInfoNotFound
 
 
 @dataclass
@@ -44,6 +44,17 @@ def get_our_activity_unit(unit_type: str) -> str:
 
     return activity_unit
 
+def map_standardized_unit_to_climatiq_units(unit: str) -> str:
+    match unit:
+        case "number":
+            return "Number,Money"
+        case "liter":
+            return "Volume,Money"
+        case "hour":
+            return "Time,Money"
+    
+    raise ValueError(f"Unit type {unit} not supported")
+    
 class Climatiq(EmissionFactorsFetcher):
     def __init__(self, api_key: str):
         self.api_key = api_key
@@ -52,12 +63,13 @@ class Climatiq(EmissionFactorsFetcher):
         self.authorization_headers = {"Authorization": f"Bearer {self.api_key}"}
 
     # Example from climatiq tutorials: https://www.climatiq.io/docs/guides/how-tos/using-python
-    def fetch_emission_factor_info(self, query, data_version = '^20') -> EmissionFactorInfo :
+    def fetch_emission_factor_info(self, query, unit_type: str, data_version = '^21') -> EmissionFactorInfo :
         url = "https://api.climatiq.io/data/v1/search"
 
         query_params = {
             "query": query,
             "data_version": data_version,
+            "unit_type": unit_type
         }
 
         found_emission_factors = requests.get(url, params=query_params, headers=self.authorization_headers).json()
@@ -102,11 +114,14 @@ class Climatiq(EmissionFactorsFetcher):
             co2e=response_json['co2e'],
             co2e_unit=response_json['co2e_unit'],
             activity_unit=get_our_activity_unit(ef_info.unit_type),
+            name=ef_info.name,
+            description=ef_info.description
         )
 
-    def fetch_emission_factor_from_query(self, query, data_version = '^20') -> EmissionFactor:
+    def fetch_emission_factor_from_query(self, query: str, unit: str = "number", data_version = '^21') -> EmissionFactor:
+        climatiq_unit_type = map_standardized_unit_to_climatiq_units(unit)
         try:
-            ef_info = self.fetch_emission_factor_info(query, data_version)
+            ef_info = self.fetch_emission_factor_info(query, climatiq_unit_type, data_version)
         except exceptions.EmissionFactorInfoNotFound:
             raise exceptions.EmissionFactorNotFound(query)
 

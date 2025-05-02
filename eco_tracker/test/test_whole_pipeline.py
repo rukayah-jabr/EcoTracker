@@ -4,41 +4,58 @@ from datetime import date
 import pytest
 from dotenv import load_dotenv
 
-from eco_tracker.categorization.climatiq_categorization import ClimatiqCategorizer
 from eco_tracker.categorization.climatiq_categorization_filter import ClimatiqCategorizerFilter
-from eco_tracker.emission_factors.climatiq import Climatiq
+from eco_tracker.categorization.groq.groq_categorizer import ClimatiqCategorizer
+from eco_tracker.emission_factors.climatiq.climatiq import Climatiq
 from eco_tracker.emission_factors.emission_factors_filter import EmissionFactorsFilter
 from eco_tracker.pipeline import Pipeline
 from eco_tracker.product import Product, SupplierAddress
+from eco_tracker.purchase_emissions.basic_estimator.basic_estimator import BasicPurchaseEmissionsEstimator
+from eco_tracker.purchase_emissions.purchase_estimator_filter import PurchaseEmissionsEstimatorFilter
 
 
 @pytest.fixture
 def climatiq():
 		load_dotenv()
-		return Climatiq(os.getenv("CLIMATIQ_API_KEY"))
+		api_key = os.getenv("CLIMATIQ_API_KEY")
+		if not api_key:
+			raise ValueError("CLIMATIQ_API_KEY is not set")
+		return Climatiq(api_key)
 
 @pytest.fixture
 def categorizer():
 	load_dotenv()
-	return ClimatiqCategorizer(os.getenv("LLM_API_KEY"))
+	llm_api_key = os.getenv("LLM_API_KEY")
+	if not llm_api_key:
+		raise ValueError("LLM_API_KEY is not set")
+	return ClimatiqCategorizer(llm_api_key)
 
 @pytest.fixture
-def emission_factors_filter(climatiq):
-	return EmissionFactorsFilter(climatiq, "^20")
+def purchase_emissions_estimator():
+	return BasicPurchaseEmissionsEstimator()
 
 @pytest.fixture
-def climatiq_categorizer(categorizer):
+def emission_factors_filter(climatiq) -> EmissionFactorsFilter:
+	return EmissionFactorsFilter(climatiq, "^21")
+
+@pytest.fixture
+def climatiq_categorizer_filter(categorizer) -> ClimatiqCategorizerFilter:
 	return ClimatiqCategorizerFilter(categorizer)
+
+@pytest.fixture
+def purchase_emissions_estimator_filter(purchase_emissions_estimator) -> PurchaseEmissionsEstimatorFilter:
+	return PurchaseEmissionsEstimatorFilter(purchase_emissions_estimator)
 
 @pytest.fixture
 def product():
 	return Product(
 		delivered_date=date(2024, 1, 1),
 		description="Lenovo Yoga 15",
-		unit="unit",
-		quantity=1,
-		price=1000,
+		unit="number",
+		unit_price=1000.00,
+		quantity=2,
 		climatiq_categories=[],
+		climatiq_matched_category=None,
 		category="category",
 		supplier="supplier",
 		supplier_address= SupplierAddress(
@@ -50,14 +67,15 @@ def product():
 		),
 		emission_factor=None,
 		delivery_distance=0,
-		co2e=0,
+		co2_purchase=0,
 		co2_transport=0,
 	)
 
-def test_fetch_emission_factor(emission_factors_filter, climatiq_categorizer, product):
+def test_fetch_emission_factor(emission_factors_filter, climatiq_categorizer_filter, purchase_emissions_estimator_filter, product):
 	pipeline = Pipeline[Product](
-		climatiq_categorizer,
+		climatiq_categorizer_filter,
 		emission_factors_filter,
+		purchase_emissions_estimator_filter,
 	)
 
 	pipeline(product)
@@ -66,3 +84,4 @@ def test_fetch_emission_factor(emission_factors_filter, climatiq_categorizer, pr
 	assert product.emission_factor.co2e is not None
 	assert product.emission_factor.co2e_unit is not None
 	assert product.emission_factor.activity_unit is not None
+	assert product.co2_purchase is not None
