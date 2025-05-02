@@ -33,8 +33,8 @@ class BreactCategorizer(Categorizer):
 
 	#actual call to API
 	def _classify(self, product: str, allowed_classes: list[str] = None) -> dict:
-		api_url_post = 'https://api-os.breact.ai/api/v1/services/classifier/process'
-		api_url_get = 'https://api-os.breact.ai/api/v1/services/result'
+		api_url_classifier = 'https://api-os.breact.ai/api/v1/services/classifier/process'
+		api_url_result = 'https://api-os.breact.ai/api/v1/services/result'
 
 		if allowed_classes is None: #in case of FE call
 			allowed_classes = [
@@ -57,7 +57,7 @@ class BreactCategorizer(Categorizer):
 			}
 		}
 
-		response_post = requests.post(api_url_post, json=request_data, headers=self.headers)
+		response_post = requests.post(api_url_classifier, json=request_data, headers=self.headers)
 		if response_post.status_code != HTTPStatus.OK:
 			raise exceptions.HTTPException(response_post.status_code, response_post.text)
 
@@ -66,7 +66,7 @@ class BreactCategorizer(Categorizer):
 		access_token = post_response_data.get('access_token')
 		process_id = post_response_data.get('process_id')
 
-		get_url = f'{api_url_get}/{process_id}?access_token={access_token}'
+		get_url = f'{api_url_result}/{process_id}?access_token={access_token}'
 		get_response_data = self._poll_for_result(get_url)
 
 		return get_response_data.get("result", {}).get("result", {})
