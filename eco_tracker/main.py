@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from eco_tracker.erp_integration.fetch_data_interface import Data, DataFetcher
 from eco_tracker.erp_integration.fetch_data_filter import FetchDataFilter
 from eco_tracker.erp_integration.odoo import Odoo
-
+from eco_tracker.distance_estimation.open_route_service import get_distance_from_delivery_address
 from eco_tracker.categorization.categorizer_interface import Categorizer
 from eco_tracker.categorization.climatiq_categorization import ClimatiqCategorizer
 from eco_tracker.categorization.climatiq_categorization_filter import ClimatiqCategorizerFilter
@@ -40,31 +40,27 @@ def main():
 
     # Run pipline over each item in data
     # TODO: adapt the FetchDataFilter to work within the pipeline?
-    # TODO: standardize the data schema in odoo.fetch_data_from_source
-    for index, item in enumerate(OdooData.data):
-        if index == 10: # limit to 10 for testing purposes
-            break
 
-        product = Product(
-            description=item['name'],
-            unit="unit",
-            quantity=item['product_uom_qty'],
-            price=item['price_unit'],
-            status="status",
-            climatiq_categories=[],
-            category="category",
-            emission_factor=None,
-            co2e=0,
-        )
+    for index, product in enumerate(OdooData.data):
+        if index == 5: # limit for testing purposes
+            break
 
         # Run pipeline
         pipeline(product)
+
+        # show returned categories and emissions factors
         print(product.climatiq_categories)
         print(product.emission_factor)
 
         #a small try out for the breact categorizer
         breact_categories = breact_categorizer.generate_categorization(product.description)
         print(f"[Breact] Categorization for '{product.description}': {breact_categories[0]}")
+
+        # show cleaned supplier addresses and get distance calculation
+        print(product.supplier_address)
+        print(f"Distance: {get_distance_from_delivery_address(odoo.delivery_address, product.supplier_address)}km")
+        
+        print("==================")
 
 if __name__ == "__main__":
     main()

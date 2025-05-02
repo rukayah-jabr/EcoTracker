@@ -1,14 +1,15 @@
 import os
+from datetime import date
 
 import pytest
 from dotenv import load_dotenv
 
 from eco_tracker.categorization.climatiq_categorization import ClimatiqCategorizer
 from eco_tracker.categorization.climatiq_categorization_filter import ClimatiqCategorizerFilter
-from eco_tracker.product import Product
 from eco_tracker.emission_factors.climatiq import Climatiq
 from eco_tracker.emission_factors.emission_factors_filter import EmissionFactorsFilter
 from eco_tracker.pipeline import Pipeline
+from eco_tracker.product import Product, SupplierAddress
 
 
 @pytest.fixture
@@ -32,15 +33,25 @@ def climatiq_categorizer(categorizer):
 @pytest.fixture
 def product():
 	return Product(
+		delivered_date=date(2024, 1, 1),
 		description="Lenovo Yoga 15",
 		unit="unit",
 		quantity=1,
 		price=1000,
-		status="status",
 		climatiq_categories=[],
 		category="category",
+		supplier="supplier",
+		supplier_address= SupplierAddress(
+			street="Schönbrunnerstraße 1",
+			city="Vienna",
+			state="Vienna",
+			zip="1010",
+			country="Austria"
+		),
 		emission_factor=None,
+		delivery_distance=0,
 		co2e=0,
+		co2_transport=0,
 	)
 
 def test_fetch_emission_factor(emission_factors_filter, climatiq_categorizer, product):

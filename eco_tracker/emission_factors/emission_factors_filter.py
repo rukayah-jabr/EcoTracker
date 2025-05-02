@@ -1,6 +1,6 @@
 from eco_tracker.product import Product
 from eco_tracker.emission_factors.emission_factors_interface import EmissionFactorsFetcher
-from eco_tracker.emission_factors.exceptions import EmissionFactorNotFound
+from eco_tracker.emission_factors.exceptions import EmissionFactorNotFound, EmissionFactorNotFoundForProduct
 from eco_tracker.pipeline import NextStep
 
 
@@ -20,4 +20,4 @@ class EmissionFactorsFilter:
 			except EmissionFactorNotFound:
 				pass
 
-		raise EmissionFactorNotFound(product.description)
+		raise EmissionFactorNotFoundForProduct(product.description, product.climatiq_categories)
