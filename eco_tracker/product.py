@@ -1,8 +1,6 @@
 from dataclasses import dataclass
 from datetime import date
 
-from eco_tracker.emission_factors.emission_factors_interface import EmissionFactor
-
 
 @dataclass
 class FailedSteps:
@@ -20,7 +18,15 @@ class Address:
 
 	def __str__(self):
 		return f"{self.street}, {self.zip} {self.city}, {self.country}"
-    
+
+@dataclass
+class EmissionFactor:
+	co2e: float
+	co2e_unit: str
+	activity_unit: str
+	name: str
+	description: str    
+
 # This is the element that is passed from one step to the next in the pipeline
 # TODO: Correct the types to the most specific ones e.g. status should be an enum
 @dataclass
@@ -39,7 +45,9 @@ class Product:
 	climatiq_matched_category: str | None # TODO: change name to 'estimate_matched_category'
 	category: str | None # TODO: Change to an enum
 	emission_factor: EmissionFactor | None
+	delivery_emission_factor: EmissionFactor | None
 	delivery_distance: float | None
+	delivery_transportation_type: str | None
 	co2_purchase: float | None
 	co2_transport: float | None
 	failed_steps: FailedSteps

@@ -30,6 +30,8 @@ def test_category_reorder_step_reorders_by_confidence(mock_breact_categorizer):
         supplier="Test Supplier",
         supplier_address=Address("Test Street", "Test City", "12345", "Test Country"),
         delivery_address=Address("Test Street", "Test City", "12345", "Test Country"),
+        delivery_transportation_type=None,
+        delivery_emission_factor=None,
         climatiq_categories=["Beleuchtung", "Elektronik", "Haushaltsgeraete", "Service"],
         climatiq_matched_category="",
         category="",

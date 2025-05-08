@@ -4,8 +4,9 @@ import requests
 
 from eco_tracker.emission_factors import exceptions
 from eco_tracker.emission_factors.climatiq.unit import return_unit
-from eco_tracker.emission_factors.emission_factors_interface import EmissionFactor, EmissionFactorsFetcher
+from eco_tracker.emission_factors.emission_factors_interface import EmissionFactorsFetcher
 from eco_tracker.emission_factors.exceptions import EmissionFactorInfoNotFound
+from eco_tracker.product import EmissionFactor
 from eco_tracker.utils.log import get_logger
 
 logger = get_logger(__name__)

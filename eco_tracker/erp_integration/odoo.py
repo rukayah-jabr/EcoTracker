@@ -161,7 +161,9 @@ class Odoo(DataFetcher):
                     climatiq_matched_category = None,
                     category = None,
                     emission_factor = None,
+                    delivery_emission_factor = None,
                     delivery_distance = 0,
+                    delivery_transportation_type = None,
                     co2_purchase = 0,
                     co2_transport = 0,
                     failed_steps = product.FailedSteps(

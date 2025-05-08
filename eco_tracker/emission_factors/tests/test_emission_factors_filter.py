@@ -5,9 +5,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-import eco_tracker.emission_factors.emission_factors_filter as emission_factors_filter
 from eco_tracker.emission_factors.emission_factors_filter import EmissionFactorsFilter
-from eco_tracker.emission_factors.emission_factors_interface import EmissionFactor, EmissionFactorsFetcher
+from eco_tracker.emission_factors.emission_factors_interface import EmissionFactor
 from eco_tracker.emission_factors.exceptions import EmissionFactorNotFound
 from eco_tracker.product import Address, FailedSteps, Product
 
@@ -36,7 +35,9 @@ def product():
       climatiq_matched_category=None,
       category="test",
       emission_factor=None,
+      delivery_emission_factor=None,
       delivery_distance=0,
+      delivery_transportation_type=None,
       delivered_date=date(2021, 1, 1),
       co2_purchase=0,
       co2_transport=0,

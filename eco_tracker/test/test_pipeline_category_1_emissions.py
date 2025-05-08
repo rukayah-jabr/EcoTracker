@@ -2,14 +2,14 @@ import os
 from datetime import date
 
 import pytest
-from distance_estimation.distance_estimation_filter import DistanceEstimationFilter
-from distance_estimation.open_route_service.open_route_service import OpenRouteService
 from dotenv import load_dotenv
 
 from eco_tracker.categorization.breact.breact_categorization import BreactCategorizer
 from eco_tracker.categorization.breact.breact_reorder_categorization import CategoryReorderStep
 from eco_tracker.categorization.climatiq_categorization_filter import ClimatiqCategorizerFilter
 from eco_tracker.categorization.groq.groq_categorizer import ClimatiqCategorizer
+from eco_tracker.distance_estimation.distance_estimation_filter import DistanceEstimationFilter
+from eco_tracker.distance_estimation.open_route_service.open_route_service import OpenRouteService
 from eco_tracker.emission_factors.climatiq.climatiq import Climatiq
 from eco_tracker.emission_factors.emission_factors_filter import EmissionFactorsFilter
 from eco_tracker.pipeline import Pipeline
@@ -98,7 +98,9 @@ def product():
 			zip="3300",
 			country="AT"
 		),
+		delivery_transportation_type=None,
 		emission_factor=None,
+		delivery_emission_factor=None,
 		delivery_distance=0,
 		co2_purchase=0,
 		co2_transport=0,

@@ -3,8 +3,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from eco_tracker.emission_factors.emission_factors_interface import EmissionFactor
-from eco_tracker.product import Address, FailedSteps, Product
+from eco_tracker.product import Address, EmissionFactor, FailedSteps, Product
 from eco_tracker.purchase_emissions.purchase_estimator_filter import PurchaseEmissionsEstimatorFilter
 
 
@@ -32,7 +31,9 @@ def product():
       climatiq_matched_category=None,
       category="test",
       emission_factor=EmissionFactor(co2e=1, co2e_unit="kg", activity_unit="l", name="test", description="test"),
+      delivery_emission_factor=None,
       delivery_distance=0,
+      delivery_transportation_type=None,
       delivered_date=date(2021, 1, 1),
       co2_purchase=0,
       co2_transport=0,

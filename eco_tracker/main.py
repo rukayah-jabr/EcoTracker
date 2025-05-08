@@ -13,6 +13,9 @@ from eco_tracker.distance_estimation.distance_estimation_interface import Distan
 from eco_tracker.emission_factors.climatiq.climatiq import Climatiq
 from eco_tracker.emission_factors.emission_factors_filter import EmissionFactorsFilter
 from eco_tracker.emission_factors.emission_factors_interface import EmissionFactorsFetcher
+from eco_tracker.emission_factors_transportation.basic_impl.basic_impl import BasicEmissionFactorsTransportationFetcher
+from eco_tracker.emission_factors_transportation.emission_factors_transportation_filter import EmissionFactorsTransportationFilter
+from eco_tracker.emission_factors_transportation.emission_factors_transportation_interface import EmissionFactorsTransportationFetcher
 from eco_tracker.erp_integration.fetch_data_filter import FetchDataFilter
 from eco_tracker.erp_integration.fetch_data_interface import DataFetcher
 from eco_tracker.erp_integration.odoo import Odoo
@@ -38,7 +41,10 @@ def main():
     breact_categorizer: Categorizer = BreactCategorizer(BREACT_API_KEY)
     climatiq: EmissionFactorsFetcher = Climatiq(CLIMATIQ_API_KEY)
     basic_purchase_estimator: PurchaseEmissionsEstimator = BasicPurchaseEmissionsEstimator()
+    
     open_route_distance_estimator: DistanceEstimator = OpenRouteService(OPEN_ROUTE_SERVICE_API_KEY)
+    emission_factors_transportation_fetcher: EmissionFactorsTransportationFetcher = BasicEmissionFactorsTransportationFetcher()
+
 
     # Define product pipeline
     pipeline = Pipeline[Product](
@@ -46,7 +52,8 @@ def main():
         CategoryReorderStep(breact_categorizer),
         EmissionFactorsFilter(climatiq, "^21"),
         PurchaseEmissionsEstimatorFilter(basic_purchase_estimator),
-        DistanceEstimationFilter(open_route_distance_estimator)
+        DistanceEstimationFilter(open_route_distance_estimator),
+        EmissionFactorsTransportationFilter(emission_factors_transportation_fetcher)
     )
 
     # Get data
@@ -83,7 +90,7 @@ def main():
         # show cleaned supplier addresses and get distance calculation
         print(product.supplier_address)
         print(f"Distance: {product.delivery_distance}km")
-
+        print("Emission factor for transportation:", product.delivery_emission_factor)
         print("==================")
 
         
