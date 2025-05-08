@@ -3,7 +3,7 @@ import hashlib
 import json
 from datetime import datetime, timedelta
 
-# Set cache expiry in seconds (30 days)
+# Set cache expiry in seconds (e.g. 30 days)
 CACHE_EXPIRY_SECONDS = 1200
 
 # Connect to SQLite DB (creates it if it doesn't exist)
@@ -38,8 +38,8 @@ def get_from_cache(key: str) -> str | None:
             return response
         # Remove expired entry
         else:
+            # print("Expired entry! Removing from cache...")
             cursor.execute("DELETE FROM api_cache WHERE key = ?", (key,))
-            print("Removed expired cache entry")
     return None
     
 # Insert API response into cache db (adds new or replaces expired existing)
@@ -51,17 +51,17 @@ def save_to_cache(url: str, request: str, response: str):
         (key, response, now)
     )
     conn.commit()
-    print(f"Saved response to cache: {request} ({url})")
+    # print(f"Saved response to cache: {request} ({url})")
 
 def cached_api_call(url:str, request: str) -> dict | None:
     key = generate_cache_key(url, request)
     cached = get_from_cache(key)
 
     if cached:
-        print(f"Found in cache! -> {request} ({url})")
+        # print(f"Found in cache! -> {request} ({url})")
         return json.loads(cached)
     else:
-        print(f"Not found in cache -> {request} {url}")
+        # print(f"Not found in cache -> {request} {url}")
         return None
     
 def get_all_from_cache() -> list:
@@ -77,12 +77,14 @@ def remove_all_from_cache() -> None:
 # product = "Test Product Name2"
 # fake_response = ["this", "is", "a", "test2"]
 
+# save_to_cache(url, product, fake_response)
+
 # cache = cached_api_call(url, product)
 # if cache == None:
 #     save_to_cache(url, product, json.dumps(fake_response))
 #     print("Saved to cache!")
 # else:
 #     print(cache)
-#remove_all_from_cache()
-data = get_all_from_cache()
-print(data)
+# remove_all_from_cache()
+# data = get_all_from_cache()
+# print(data)
