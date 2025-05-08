@@ -9,7 +9,7 @@ import eco_tracker.emission_factors.emission_factors_filter as emission_factors_
 from eco_tracker.emission_factors.emission_factors_filter import EmissionFactorsFilter
 from eco_tracker.emission_factors.emission_factors_interface import EmissionFactor, EmissionFactorsFetcher
 from eco_tracker.emission_factors.exceptions import EmissionFactorNotFound
-from eco_tracker.product import FailedSteps, Product, SupplierAddress
+from eco_tracker.product import Address, FailedSteps, Product
 
 
 @pytest.fixture
@@ -20,8 +20,13 @@ def product():
     quantity=1,
     unit_price=1,
       supplier="test",
-      supplier_address=SupplierAddress(
+      supplier_address=Address(
         "test",
+        "test",
+        "test",
+        "test"
+      ),
+      delivery_address=Address(
         "test",
         "test",
         "test",
@@ -35,9 +40,12 @@ def product():
       delivered_date=date(2021, 1, 1),
       co2_purchase=0,
       co2_transport=0,
-      failed_steps=FailedSteps(estimate_categories=False,
-      emission_factor_fetching=False,
-      purchase_co2_calculation=False)
+      failed_steps=FailedSteps(
+        estimate_categories=False,
+        emission_factor_fetching=False,
+        purchase_co2_calculation=False,
+        distance_estimation=False
+      )
     )
 
 @pytest.fixture

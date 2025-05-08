@@ -2,6 +2,8 @@ import os
 from datetime import date
 
 import pytest
+from distance_estimation.distance_estimation_filter import DistanceEstimationFilter
+from distance_estimation.open_route_service.open_route_service import OpenRouteService
 from dotenv import load_dotenv
 
 from eco_tracker.categorization.breact.breact_categorization import BreactCategorizer
@@ -11,7 +13,7 @@ from eco_tracker.categorization.groq.groq_categorizer import ClimatiqCategorizer
 from eco_tracker.emission_factors.climatiq.climatiq import Climatiq
 from eco_tracker.emission_factors.emission_factors_filter import EmissionFactorsFilter
 from eco_tracker.pipeline import Pipeline
-from eco_tracker.product import FailedSteps, Product, SupplierAddress
+from eco_tracker.product import Address, FailedSteps, Product
 from eco_tracker.purchase_emissions.basic_estimator.basic_estimator import BasicPurchaseEmissionsEstimator
 from eco_tracker.purchase_emissions.purchase_estimator_filter import PurchaseEmissionsEstimatorFilter
 
@@ -41,6 +43,14 @@ def breact_categorizer():
 	return BreactCategorizer(breact_api_key)
 
 @pytest.fixture
+def open_route_service():
+	load_dotenv()
+	open_route_service_api_key = os.getenv("OPEN_ROUTE_SERVICE_API_KEY")
+	if not open_route_service_api_key:
+		raise ValueError("OPEN_ROUTE_SERVICE_API_KEY is not set")
+	return OpenRouteService(open_route_service_api_key)
+
+@pytest.fixture
 def purchase_emissions_estimator():
 	return BasicPurchaseEmissionsEstimator()
 
@@ -61,6 +71,10 @@ def purchase_emissions_estimator_filter(purchase_emissions_estimator) -> Purchas
 	return PurchaseEmissionsEstimatorFilter(purchase_emissions_estimator)
 
 @pytest.fixture
+def distance_estimation_filter(open_route_service) -> DistanceEstimationFilter:
+	return DistanceEstimationFilter(open_route_service)
+
+@pytest.fixture
 def product():
 	return Product(
 		delivered_date=date(2024, 1, 1),
@@ -72,12 +86,17 @@ def product():
 		climatiq_matched_category=None,
 		category="category",
 		supplier="supplier",
-		supplier_address= SupplierAddress(
+		supplier_address= Address(
 			street="Schönbrunnerstraße 1",
 			city="Vienna",
-			state="Vienna",
 			zip="1010",
-			country="Austria"
+			country="AT"
+		),
+		delivery_address= Address(
+			street="Stadtwerkestr. 2",
+			city="Amstetten",
+			zip="3300",
+			country="AT"
 		),
 		emission_factor=None,
 		delivery_distance=0,
@@ -86,16 +105,17 @@ def product():
 		failed_steps=FailedSteps(
 			estimate_categories=False,
 			emission_factor_fetching=False,
-			purchase_co2_calculation=False
+			purchase_co2_calculation=False,
+			distance_estimation=False
 		)
 	)
 
-def test_fetch_emission_factor(emission_factors_filter, category_reorder_step, climatiq_categorizer_filter, purchase_emissions_estimator_filter, product):
+def test_estimate_category_1_emissions(emission_factors_filter, category_reorder_step, climatiq_categorizer_filter, purchase_emissions_estimator_filter, distance_estimation_filter, product):
 	pipeline = Pipeline[Product](
 		climatiq_categorizer_filter,
 		category_reorder_step,
 		emission_factors_filter,
-		purchase_emissions_estimator_filter,
+		purchase_emissions_estimator_filter
 	)
 
 	pipeline(product)
@@ -105,3 +125,13 @@ def test_fetch_emission_factor(emission_factors_filter, category_reorder_step, c
 	assert product.emission_factor.co2e_unit is not None
 	assert product.emission_factor.activity_unit is not None
 	assert product.co2_purchase is not None
+ 
+def test_estimate_category_4_emissions(distance_estimation_filter, product):
+	pipeline = Pipeline[Product](
+		distance_estimation_filter
+	)
+
+	pipeline(product)
+
+	assert product.delivery_distance is not None
+	# assert product.co2_transport is not None

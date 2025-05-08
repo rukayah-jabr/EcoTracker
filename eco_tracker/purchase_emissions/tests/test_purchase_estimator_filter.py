@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from eco_tracker.emission_factors.emission_factors_interface import EmissionFactor
-from eco_tracker.product import FailedSteps, Product, SupplierAddress
+from eco_tracker.product import Address, FailedSteps, Product
 from eco_tracker.purchase_emissions.purchase_estimator_filter import PurchaseEmissionsEstimatorFilter
 
 
@@ -16,8 +16,13 @@ def product():
     quantity=1,
     unit_price=1,
       supplier="test",
-      supplier_address=SupplierAddress(
+      supplier_address=Address(
         "test",
+        "test",
+        "test",
+        "test"
+      ),
+      delivery_address=Address(
         "test",
         "test",
         "test",
@@ -34,7 +39,8 @@ def product():
       failed_steps=FailedSteps(
         estimate_categories=False,
         emission_factor_fetching=False,
-        purchase_co2_calculation=False
+        purchase_co2_calculation=False,
+        distance_estimation=False
       )
     )
 

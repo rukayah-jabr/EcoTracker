@@ -1,5 +1,6 @@
 import os
 
+from distance_estimation.open_route_service.open_route_service import OpenRouteService
 from dotenv import load_dotenv
 
 from eco_tracker.categorization.breact.breact_categorization import BreactCategorizer
@@ -7,7 +8,8 @@ from eco_tracker.categorization.breact.breact_reorder_categorization import Cate
 from eco_tracker.categorization.categorizer_interface import Categorizer
 from eco_tracker.categorization.climatiq_categorization_filter import ClimatiqCategorizerFilter
 from eco_tracker.categorization.groq.groq_categorizer import ClimatiqCategorizer
-from eco_tracker.distance_estimation.open_route_service import get_distance_from_delivery_address
+from eco_tracker.distance_estimation.distance_estimation_filter import DistanceEstimationFilter
+from eco_tracker.distance_estimation.distance_estimation_interface import DistanceEstimator
 from eco_tracker.emission_factors.climatiq.climatiq import Climatiq
 from eco_tracker.emission_factors.emission_factors_filter import EmissionFactorsFilter
 from eco_tracker.emission_factors.emission_factors_interface import EmissionFactorsFetcher
@@ -27,6 +29,7 @@ load_dotenv()
 CLIMATIQ_API_KEY=os.getenv("CLIMATIQ_API_KEY")
 LLM_API_KEY=os.getenv("LLM_API_KEY")
 BREACT_API_KEY=os.getenv("BREACT_API_KEY")
+OPEN_ROUTE_SERVICE_API_KEY=os.getenv("OPEN_ROUTE_SERVICE_API_KEY")
 
 def main():
 
@@ -35,6 +38,7 @@ def main():
     breact_categorizer: Categorizer = BreactCategorizer(BREACT_API_KEY)
     climatiq: EmissionFactorsFetcher = Climatiq(CLIMATIQ_API_KEY)
     basic_purchase_estimator: PurchaseEmissionsEstimator = BasicPurchaseEmissionsEstimator()
+    open_route_distance_estimator: DistanceEstimator = OpenRouteService(OPEN_ROUTE_SERVICE_API_KEY)
 
     # Define product pipeline
     pipeline = Pipeline[Product](
@@ -42,6 +46,7 @@ def main():
         CategoryReorderStep(breact_categorizer),
         EmissionFactorsFilter(climatiq, "^21"),
         PurchaseEmissionsEstimatorFilter(basic_purchase_estimator),
+        DistanceEstimationFilter(open_route_distance_estimator)
     )
 
     # Get data
@@ -77,7 +82,7 @@ def main():
         print("Purchase emissions:", product.co2_purchase)
         # show cleaned supplier addresses and get distance calculation
         print(product.supplier_address)
-        print(f"Distance: {get_distance_from_delivery_address(odoo.delivery_address, product.supplier_address)}km")
+        print(f"Distance: {product.delivery_distance}km")
 
         print("==================")
 
