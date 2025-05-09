@@ -163,6 +163,7 @@ class Odoo(DataFetcher):
                     emission_factor = None,
                     delivery_emission_factor = None,
                     delivery_distance = 0,
+                    weight = 0,
                     delivery_transportation_type = None,
                     co2_purchase = 0,
                     co2_transport = 0,
@@ -170,7 +171,8 @@ class Odoo(DataFetcher):
                         estimate_categories = False,
                         emission_factor_fetching = False,
                         purchase_co2_calculation = False,
-                        distance_estimation = False
+                        distance_estimation = False,
+                        weight_estimation = False
                     )
                 )
             data.data.append(standardized_item)

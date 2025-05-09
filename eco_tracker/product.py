@@ -8,7 +8,8 @@ class FailedSteps:
 	emission_factor_fetching: bool
 	purchase_co2_calculation: bool
 	distance_estimation: bool
-    
+	weight_estimation: bool
+
 class Address:
 	def __init__(self, street: str, city: str, zip:str, country:str):
 		self.street = street
@@ -48,6 +49,7 @@ class Product:
 	delivery_emission_factor: EmissionFactor | None
 	delivery_distance: float | None
 	delivery_transportation_type: str | None
+	weight: float | None # in kg
 	co2_purchase: float | None
 	co2_transport: float | None
 	failed_steps: FailedSteps

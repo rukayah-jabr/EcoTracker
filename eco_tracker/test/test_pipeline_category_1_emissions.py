@@ -102,13 +102,15 @@ def product():
 		emission_factor=None,
 		delivery_emission_factor=None,
 		delivery_distance=0,
+		weight=0,
 		co2_purchase=0,
 		co2_transport=0,
 		failed_steps=FailedSteps(
 			estimate_categories=False,
 			emission_factor_fetching=False,
 			purchase_co2_calculation=False,
-			distance_estimation=False
+			distance_estimation=False,
+			weight_estimation=False
 		)
 	)
 

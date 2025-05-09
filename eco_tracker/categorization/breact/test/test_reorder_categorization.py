@@ -37,13 +37,15 @@ def test_category_reorder_step_reorders_by_confidence(mock_breact_categorizer):
         category="",
         emission_factor=None,
         delivery_distance=0.0,
+        weight=0.0,
         co2_purchase=0.0,
         co2_transport=0.0,
         failed_steps=FailedSteps(
             emission_factor_fetching=False,
             purchase_co2_calculation=False,
             estimate_categories=False,
-            distance_estimation=False
+            distance_estimation=False,
+            weight_estimation=False
         )
     )
 

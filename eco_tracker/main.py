@@ -25,6 +25,9 @@ from eco_tracker.purchase_emissions.basic_estimator.basic_estimator import Basic
 from eco_tracker.purchase_emissions.purchase_estimator_filter import PurchaseEmissionsEstimatorFilter
 from eco_tracker.purchase_emissions.purchase_estimator_interface import PurchaseEmissionsEstimator
 from eco_tracker.utils.log import get_logger
+from eco_tracker.weight_estimation.groq.groq import GroqWeightEstimator
+from eco_tracker.weight_estimation.weight_estimation_filter import WeightEstimationFilter
+from eco_tracker.weight_estimation.weight_estimation_interface import WeightEstimator
 
 logger = get_logger("main")
 
@@ -44,7 +47,7 @@ def main():
     
     open_route_distance_estimator: DistanceEstimator = OpenRouteService(OPEN_ROUTE_SERVICE_API_KEY)
     emission_factors_transportation_fetcher: EmissionFactorsTransportationFetcher = BasicEmissionFactorsTransportationFetcher()
-
+    groq_weight_estimator: WeightEstimator = GroqWeightEstimator(LLM_API_KEY)
 
     # Define product pipeline
     pipeline = Pipeline[Product](
@@ -53,7 +56,8 @@ def main():
         EmissionFactorsFilter(climatiq, "^21"),
         PurchaseEmissionsEstimatorFilter(basic_purchase_estimator),
         DistanceEstimationFilter(open_route_distance_estimator),
-        EmissionFactorsTransportationFilter(emission_factors_transportation_fetcher)
+        EmissionFactorsTransportationFilter(emission_factors_transportation_fetcher),
+        WeightEstimationFilter(groq_weight_estimator)
     )
 
     # Get data
@@ -91,6 +95,7 @@ def main():
         print(product.supplier_address)
         print(f"Distance: {product.delivery_distance}km")
         print("Emission factor for transportation:", product.delivery_emission_factor)
+        print("Weight of the product(s) (in kg):", product.weight)
         print("==================")
 
         

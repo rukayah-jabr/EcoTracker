@@ -33,6 +33,7 @@ def product():
       emission_factor=EmissionFactor(co2e=1, co2e_unit="kg", activity_unit="l", name="test", description="test"),
       delivery_emission_factor=None,
       delivery_distance=0,
+      weight=0,
       delivery_transportation_type=None,
       delivered_date=date(2021, 1, 1),
       co2_purchase=0,
@@ -41,7 +42,8 @@ def product():
         estimate_categories=False,
         emission_factor_fetching=False,
         purchase_co2_calculation=False,
-        distance_estimation=False
+        distance_estimation=False,
+        weight_estimation=False
       )
     )
 
