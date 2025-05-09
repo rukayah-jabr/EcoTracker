@@ -1,6 +1,7 @@
-import sqlite3
 import hashlib
 import json
+import sqlite3
+from collections.abc import Callable
 from datetime import datetime, timedelta
 
 # Set cache expiry in seconds (e.g. 30 days = 2592000)
@@ -65,3 +66,19 @@ def cached_api_call(url:str, request: str) -> dict | None:
 #      cursor.execute("SELECT key, response, timestamp FROM api_cache")
 #      data = cursor.fetchall()
 #      return data
+
+def execute_or_get_from_cache(url: str, request: str) -> Callable:
+    def decorator(function: Callable):
+        def wrapper(*args, **kwargs):
+            # Check for cached API response first; if none, make fresh API call
+            cache = cached_api_call(url, request)
+            if cache == None:
+                response = function(*args, **kwargs)
+                save_to_cache(url, request, json.dumps(response))
+                return response
+            else:
+                return cache
+        
+        return wrapper
+    return decorator
+    

@@ -1,11 +1,10 @@
+import json
 from http import HTTPStatus
 
 import requests
-import json
 
-from eco_tracker import exceptions
+from eco_tracker import api_cache, exceptions
 from eco_tracker.categorization.categorizer_interface import Categorizer
-from eco_tracker import api_cache
 
 
 class ClimatiqCategorizer(Categorizer):
@@ -36,10 +35,9 @@ class ClimatiqCategorizer(Categorizer):
 				"role": "system",
 			}]
 		}
-
-		# Check for cached API response first; if none, make fresh API call
-		cache = api_cache.cached_api_call(url, product)
-		if cache == None:
+  
+		@api_cache.execute_or_get_from_cache(url=url, request=product)
+		def fetch_categories(body: dict) -> list:
 			response = requests.post(url, json=body, headers=self.authorization_headers)
 			if response.status_code != HTTPStatus.OK:
 				raise exceptions.HTTPException(response.status_code, response.text)
@@ -47,11 +45,9 @@ class ClimatiqCategorizer(Categorizer):
 			body = response.json()
 			response_message = body['choices'][0]['message']['content']
 			categories = parse_generated_categories(response_message)
-			# Save response to API cache
-			api_cache.save_to_cache(url, product, json.dumps(categories))
 			return categories
-		else:
-			return cache
+ 
+		return fetch_categories(body)
 
 def parse_generated_categories(llm_categories: str) -> list:
 	categories = []
