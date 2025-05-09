@@ -3,8 +3,8 @@ import hashlib
 import json
 from datetime import datetime, timedelta
 
-# Set cache expiry in seconds (e.g. 30 days)
-CACHE_EXPIRY_SECONDS = 1200
+# Set cache expiry in seconds (e.g. 30 days = 2592000)
+CACHE_EXPIRY_SECONDS = 2592000
 
 # Connect to SQLite DB (creates it if it doesn't exist)
 conn = sqlite3.connect("api_cache.db")
@@ -38,7 +38,6 @@ def get_from_cache(key: str) -> str | None:
             return response
         # Remove expired entry
         else:
-            # print("Expired entry! Removing from cache...")
             cursor.execute("DELETE FROM api_cache WHERE key = ?", (key,))
     return None
     
@@ -51,40 +50,18 @@ def save_to_cache(url: str, request: str, response: str):
         (key, response, now)
     )
     conn.commit()
-    # print(f"Saved response to cache: {request} ({url})")
 
 def cached_api_call(url:str, request: str) -> dict | None:
     key = generate_cache_key(url, request)
     cached = get_from_cache(key)
 
     if cached:
-        # print(f"Found in cache! -> {request} ({url})")
         return json.loads(cached)
     else:
-        # print(f"Not found in cache -> {request} {url}")
         return None
-    
-def get_all_from_cache() -> list:
-     cursor.execute("SELECT key, response, timestamp FROM api_cache")
-     data = cursor.fetchall()
-     return data
 
-def remove_all_from_cache() -> None:
-     cursor.execute("DELETE FROM api_cache")
-     conn.commit()
-
-# url = "http://test-api-call.com/api"
-# product = "Test Product Name2"
-# fake_response = ["this", "is", "a", "test2"]
-
-# save_to_cache(url, product, fake_response)
-
-# cache = cached_api_call(url, product)
-# if cache == None:
-#     save_to_cache(url, product, json.dumps(fake_response))
-#     print("Saved to cache!")
-# else:
-#     print(cache)
-# remove_all_from_cache()
-# data = get_all_from_cache()
-# print(data)
+# Temporary helper function while developing to check full cache
+# def get_all_from_cache() -> list:
+#      cursor.execute("SELECT key, response, timestamp FROM api_cache")
+#      data = cursor.fetchall()
+#      return data

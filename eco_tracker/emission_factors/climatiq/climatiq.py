@@ -1,11 +1,13 @@
 from dataclasses import dataclass
 
 import requests
+import json
 
 from eco_tracker.emission_factors import exceptions
 from eco_tracker.emission_factors.climatiq.unit import return_unit
 from eco_tracker.emission_factors.emission_factors_interface import EmissionFactor, EmissionFactorsFetcher
 from eco_tracker.emission_factors.exceptions import EmissionFactorInfoNotFound
+from eco_tracker import api_cache
 
 
 @dataclass
@@ -105,11 +107,18 @@ class Climatiq(EmissionFactorsFetcher):
 
         set_correct_unit_in_req_body(ef_info.unit_type, req_body)
 
-        response = requests.post(url, json=req_body, headers=self.authorization_headers)
-        if not response.ok:
-            raise exceptions.EmissionFactorNotFound(ef_info.activity_id)
+        # Check for cached API response and use if exists; otherwise make fresh call and save to cache
+        cache = api_cache.cached_api_call(url, json.dumps(req_body))
+        if cache == None:
+            response = requests.post(url, json=req_body, headers=self.authorization_headers)
+            if not response.ok:
+                raise exceptions.EmissionFactorNotFound(ef_info.activity_id)
+            
+            response_json = response.json()
+            api_cache.save_to_cache(url, json.dumps(req_body), json.dumps(response_json))
+        else:
+            response_json = cache
 
-        response_json = response.json()
         return EmissionFactor(
             co2e=response_json['co2e'],
             co2e_unit=response_json['co2e_unit'],
