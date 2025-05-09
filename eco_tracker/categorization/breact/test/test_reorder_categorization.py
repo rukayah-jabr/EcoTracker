@@ -5,7 +5,7 @@ import pytest
 
 from eco_tracker.categorization.breact.breact_categorization import BreactCategorizer
 from eco_tracker.categorization.breact.breact_reorder_categorization import CategoryReorderStep
-from eco_tracker.product import Product, SupplierAddress
+from eco_tracker.product import FailedSteps, Product, SupplierAddress
 
 
 @pytest.fixture
@@ -36,6 +36,11 @@ def test_category_reorder_step_reorders_by_confidence(mock_breact_categorizer):
         delivery_distance=0.0,
         co2_purchase=0.0,
         co2_transport=0.0,
+        failed_steps=FailedSteps(
+            emission_factor_fetching=False,
+            purchase_co2_calculation=False,
+            estimate_categories=False,
+        )
     )
 
     next_step = MagicMock()  # fake a call to check later

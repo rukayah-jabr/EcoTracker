@@ -1,6 +1,6 @@
-from eco_tracker.product import Product
-from eco_tracker.pipeline import NextStep
 from eco_tracker.categorization.breact.breact_categorization import BreactCategorizer
+from eco_tracker.pipeline import NextStep
+from eco_tracker.product import Product
 
 
 class CategoryReorderStep:
@@ -8,7 +8,7 @@ class CategoryReorderStep:
         self.categorizer = categorizer
 
     def __call__(self, product: Product, next_step: NextStep) -> None:
-        if not product.climatiq_categories: #in case there is no categories
+        if product.failed_steps.estimate_categories or not product.climatiq_categories: #in case there is no categories
             next_step(product)
             return
 

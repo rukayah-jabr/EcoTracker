@@ -1,10 +1,12 @@
 import os
+from unittest.mock import patch
 
 import pytest
+import requests
 from dotenv import load_dotenv
 
 import eco_tracker.emission_factors.climatiq.climatiq as climatiq
-from eco_tracker.emission_factors.exceptions import EmissionFactorNotFound
+from eco_tracker.emission_factors.exceptions import EmissionFactorInfoNotFound, EmissionFactorNotFound
 
 
 @pytest.fixture
@@ -33,7 +35,7 @@ def emission_factor_info():
     )
 
 def test_fetch_emission_factor_info_not_found(climatiq_instance):
-    with pytest.raises(climatiq.EmissionFactorInfoNotFound):
+    with pytest.raises(EmissionFactorInfoNotFound):
         climatiq_instance.fetch_emission_factor_info(query="air filter", unit_type="Money", data_version="^21")
 
 def test_fetch_emission_factor_info_success(climatiq_instance):
@@ -51,6 +53,34 @@ def test_fetch_emission_factor_info_success_another(climatiq_instance):
     best_matching_factor = climatiq_instance.fetch_emission_factor_info(query="laptop", unit_type="Number", data_version="^21")
     assert best_matching_factor.activity_id is not None
 
+def test_fetch_emission_factor_info_request_exception(climatiq_instance):
+    with patch('requests.get') as mock_get:
+        # time out exception
+        mock_get.side_effect = requests.exceptions.RequestException("Mocked request exception")
+        with pytest.raises(Exception):
+            climatiq_instance.fetch_emission_factor_info(query="laptop", unit_type="Number", data_version="^21")
+
+def test_fetch_emission_factor_info_error_code(climatiq_instance):
+    with patch('requests.get') as mock_get:
+        mock_get.return_value.status_code = 400
+        mock_get.return_value.ok = False
+        with pytest.raises(EmissionFactorInfoNotFound):
+            climatiq_instance.fetch_emission_factor_info(query="laptop", unit_type="Number", data_version="^21")
+
+def test_fetch_emission_factor_info_no_results(climatiq_instance):
+    with patch('requests.get') as mock_get:
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = {"total_results": 0}
+        with pytest.raises(EmissionFactorInfoNotFound):
+            climatiq_instance.fetch_emission_factor_info(query="laptop", unit_type="Number", data_version="^21")
+
+def test_fetch_emission_factor_error_code(climatiq_instance, emission_factor_info):
+    with patch('requests.post') as mock_post:
+        mock_post.return_value.status_code = 400
+        mock_post.return_value.ok = False
+        with pytest.raises(EmissionFactorNotFound):
+            climatiq_instance.fetch_emission_factor(emission_factor_info)
+            
 def test_fetch_emission_factor_factor_not_found(climatiq_instance, emission_factor_info):
     emission_factor_info.activity_id = 'not-correct'
     emission_factor_info.id = 'not-correct'

@@ -4,7 +4,9 @@ import requests
 
 from eco_tracker import exceptions
 from eco_tracker.categorization.categorizer_interface import Categorizer
+from eco_tracker.utils.log import get_logger
 
+logger = get_logger(__name__)
 
 class ClimatiqCategorizer(Categorizer):
 	def __init__(self, llm_api_key: str):
@@ -37,6 +39,7 @@ class ClimatiqCategorizer(Categorizer):
 
 		response = requests.post(url, json=body, headers=self.authorization_headers)
 		if response.status_code != HTTPStatus.OK:
+			logger.error(f"Failed to generate categorization for product {product}: {response.status_code} {response.text}")
 			raise exceptions.HTTPException(response.status_code, response.text)
 
 		body = response.json()

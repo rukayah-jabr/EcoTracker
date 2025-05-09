@@ -6,6 +6,7 @@ import requests
 from eco_tracker import exceptions
 from eco_tracker.categorization.categorizer_interface import Categorizer
 
+
 class BreactCategorizer(Categorizer):
 	def __init__(self, breact_api_key: str):
 		self.breact_api_key = breact_api_key
@@ -32,7 +33,7 @@ class BreactCategorizer(Categorizer):
 		return result.get("confidence", 0.0)
 
 	#actual call to API
-	def _classify(self, product: str, allowed_classes: list[str] = None) -> dict:
+	def _classify(self, product: str, allowed_classes: list[str] | None = None) -> dict:
 		api_url_classifier = 'https://api-os.breact.ai/api/v1/services/classifier/process'
 		api_url_result = 'https://api-os.breact.ai/api/v1/services/result'
 
@@ -71,7 +72,7 @@ class BreactCategorizer(Categorizer):
 
 		return get_response_data.get("result", {}).get("result", {})
 
-	def _poll_for_result(self, url: str, timeout: int = 30, interval: int = 2) -> dict:
+	def _poll_for_result(self, url: str, timeout: int = 30, interval: float = 0.5) -> dict:
 		start_time = time.time()
 		while time.time() - start_time < timeout:
 			response = requests.get(url, headers=self.headers)

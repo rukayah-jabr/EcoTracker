@@ -1,8 +1,10 @@
-from eco_tracker.product import Product
 from eco_tracker.emission_factors.emission_factors_interface import EmissionFactorsFetcher
 from eco_tracker.emission_factors.exceptions import EmissionFactorNotFound, EmissionFactorNotFoundForProduct
 from eco_tracker.pipeline import NextStep
+from eco_tracker.product import Product
+from eco_tracker.utils.log import get_logger
 
+logger = get_logger(__name__)
 
 class EmissionFactorsFilter:
 
@@ -11,6 +13,11 @@ class EmissionFactorsFilter:
 		self.data_version = data_version
 
 	def __call__(self, product: Product, next_step: NextStep) -> None:
+		if product.failed_steps.estimate_categories:
+			product.failed_steps.emission_factor_fetching = True
+			next_step(product)
+			return None
+			
 		for category in product.climatiq_categories:
 			try:
 				emission_factor = self.emission_factors_fetcher.fetch_emission_factor_from_query(category, product.unit, self.data_version)
@@ -20,5 +27,10 @@ class EmissionFactorsFilter:
 				return None
 			except EmissionFactorNotFound:
 				pass
-
-		raise EmissionFactorNotFoundForProduct(product.description, product.climatiq_categories)
+			except Exception as e:
+				logger.error(f"Error fetching emission factor for product {product.description}: {e}")
+				raise e
+    
+		logger.error(f"No emission factor found for product {product.description} with categories {product.climatiq_categories}")
+		product.failed_steps.emission_factor_fetching = True
+		next_step(product)
