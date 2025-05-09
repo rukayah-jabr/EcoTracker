@@ -2,16 +2,18 @@ import os
 from datetime import date
 
 import pytest
+from delivery_emissions.delivery_emissions_estimator_filter import DeliveryEmissionsEstimatorFilter
 from dotenv import load_dotenv
-from weight_estimation.groq.groq import GroqWeightEstimator
-from weight_estimation.weight_estimation_filter import WeightEstimationFilter
 
+from eco_tracker.delivery_emissions.distance_based_method.distance_based_method import DistanceBasedMethod
 from eco_tracker.distance_estimation.distance_estimation_filter import DistanceEstimationFilter
 from eco_tracker.distance_estimation.open_route_service.open_route_service import OpenRouteService
 from eco_tracker.emission_factors_transportation.basic_impl.basic_impl import BasicEmissionFactorsTransportationFetcher
 from eco_tracker.emission_factors_transportation.emission_factors_transportation_filter import EmissionFactorsTransportationFilter
 from eco_tracker.pipeline import Pipeline
 from eco_tracker.product import Address, FailedSteps, Product
+from eco_tracker.weight_estimation.groq.groq import GroqWeightEstimator
+from eco_tracker.weight_estimation.weight_estimation_filter import WeightEstimationFilter
 
 
 @pytest.fixture
@@ -35,6 +37,10 @@ def groq_weight_estimator():
 	return GroqWeightEstimator(groq_api_key)
 
 @pytest.fixture
+def distance_based_method():
+	return DistanceBasedMethod()
+
+@pytest.fixture
 def distance_estimation_filter(open_route_service) -> DistanceEstimationFilter:
 	return DistanceEstimationFilter(open_route_service)
 
@@ -45,6 +51,10 @@ def emission_factors_transportation_filter(emission_factors_transportation_fetch
 @pytest.fixture
 def weight_estimation_filter(groq_weight_estimator) -> WeightEstimationFilter:
 	return WeightEstimationFilter(groq_weight_estimator)
+
+@pytest.fixture
+def delivery_emissions_estimator_filter(distance_based_method) -> DeliveryEmissionsEstimatorFilter:
+	return DeliveryEmissionsEstimatorFilter(distance_based_method)
 
 @pytest.fixture
 def product():
@@ -82,15 +92,17 @@ def product():
 			emission_factor_fetching=False,
 			purchase_co2_calculation=False,
 			distance_estimation=False,
-			weight_estimation=False
+			weight_estimation=False,
+			delivery_emissions_estimation=False
 		),
 	)
  
-def test_estimate_category_4_emissions(distance_estimation_filter, emission_factors_transportation_filter, weight_estimation_filter, product):
+def test_estimate_category_4_emissions(distance_estimation_filter, emission_factors_transportation_filter, weight_estimation_filter, delivery_emissions_estimator_filter, product):
 	pipeline = Pipeline[Product](
 		distance_estimation_filter,
 		emission_factors_transportation_filter,
-		weight_estimation_filter
+		weight_estimation_filter,
+		delivery_emissions_estimator_filter
 	)
 
 	pipeline(product)
@@ -98,4 +110,5 @@ def test_estimate_category_4_emissions(distance_estimation_filter, emission_fact
 	assert product.delivery_distance is not None
 	assert product.delivery_emission_factor is not None
 	assert product.weight is not None
+	assert product.co2_transport != 0
 	# assert product.co2_transport is not None

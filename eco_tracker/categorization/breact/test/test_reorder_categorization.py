@@ -45,7 +45,8 @@ def test_category_reorder_step_reorders_by_confidence(mock_breact_categorizer):
             purchase_co2_calculation=False,
             estimate_categories=False,
             distance_estimation=False,
-            weight_estimation=False
+            weight_estimation=False,
+            delivery_emissions_estimation=False
         )
     )
 

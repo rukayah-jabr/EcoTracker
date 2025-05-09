@@ -1,6 +1,5 @@
 import os
 
-from distance_estimation.open_route_service.open_route_service import OpenRouteService
 from dotenv import load_dotenv
 
 from eco_tracker.categorization.breact.breact_categorization import BreactCategorizer
@@ -8,8 +7,11 @@ from eco_tracker.categorization.breact.breact_reorder_categorization import Cate
 from eco_tracker.categorization.categorizer_interface import Categorizer
 from eco_tracker.categorization.climatiq_categorization_filter import ClimatiqCategorizerFilter
 from eco_tracker.categorization.groq.groq_categorizer import ClimatiqCategorizer
+from eco_tracker.delivery_emissions.delivery_emissions_estimator_filter import DeliveryEmissionsEstimatorFilter
+from eco_tracker.delivery_emissions.distance_based_method.distance_based_method import DistanceBasedMethod
 from eco_tracker.distance_estimation.distance_estimation_filter import DistanceEstimationFilter
 from eco_tracker.distance_estimation.distance_estimation_interface import DistanceEstimator
+from eco_tracker.distance_estimation.open_route_service.open_route_service import OpenRouteService
 from eco_tracker.emission_factors.climatiq.climatiq import Climatiq
 from eco_tracker.emission_factors.emission_factors_filter import EmissionFactorsFilter
 from eco_tracker.emission_factors.emission_factors_interface import EmissionFactorsFetcher
@@ -48,6 +50,7 @@ def main():
     open_route_distance_estimator: DistanceEstimator = OpenRouteService(OPEN_ROUTE_SERVICE_API_KEY)
     emission_factors_transportation_fetcher: EmissionFactorsTransportationFetcher = BasicEmissionFactorsTransportationFetcher()
     groq_weight_estimator: WeightEstimator = GroqWeightEstimator(LLM_API_KEY)
+    distance_based_method: DistanceBasedMethod = DistanceBasedMethod()
 
     # Define product pipeline
     pipeline = Pipeline[Product](
@@ -55,9 +58,11 @@ def main():
         CategoryReorderStep(breact_categorizer),
         EmissionFactorsFilter(climatiq, "^21"),
         PurchaseEmissionsEstimatorFilter(basic_purchase_estimator),
+        
         DistanceEstimationFilter(open_route_distance_estimator),
         EmissionFactorsTransportationFilter(emission_factors_transportation_fetcher),
-        WeightEstimationFilter(groq_weight_estimator)
+        WeightEstimationFilter(groq_weight_estimator),
+        DeliveryEmissionsEstimatorFilter(distance_based_method)
     )
 
     # Get data
@@ -94,8 +99,8 @@ def main():
         # show cleaned supplier addresses and get distance calculation
         print(product.supplier_address)
         print(f"Distance: {product.delivery_distance}km")
-        print("Emission factor for transportation:", product.delivery_emission_factor)
         print("Weight of the product(s) (in kg):", product.weight)
+        print("Delivery emissions:", product.co2_transport)
         print("==================")
 
         

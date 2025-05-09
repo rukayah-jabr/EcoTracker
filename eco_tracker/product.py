@@ -9,6 +9,7 @@ class FailedSteps:
 	purchase_co2_calculation: bool
 	distance_estimation: bool
 	weight_estimation: bool
+	delivery_emissions_estimation: bool
 
 class Address:
 	def __init__(self, street: str, city: str, zip:str, country:str):

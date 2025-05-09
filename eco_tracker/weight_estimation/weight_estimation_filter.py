@@ -1,8 +1,8 @@
 from pipeline import NextStep
 from product import Product
-from weight_estimation.weight_estimation_interface import WeightEstimator
 
 from eco_tracker.utils.log import get_logger
+from eco_tracker.weight_estimation.weight_estimation_interface import WeightEstimator
 
 logger = get_logger(__name__)
 

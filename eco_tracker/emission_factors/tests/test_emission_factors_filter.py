@@ -47,7 +47,8 @@ def product():
         emission_factor_fetching=False,
         purchase_co2_calculation=False,
         distance_estimation=False,
-        weight_estimation=False
+        weight_estimation=False,
+        delivery_emissions_estimation=False
       )
     )
 

@@ -110,7 +110,8 @@ def product():
 			emission_factor_fetching=False,
 			purchase_co2_calculation=False,
 			distance_estimation=False,
-			weight_estimation=False
+			weight_estimation=False,
+			delivery_emissions_estimation=False
 		)
 	)
 
@@ -129,13 +130,3 @@ def test_estimate_category_1_emissions(emission_factors_filter, category_reorder
 	assert product.emission_factor.co2e_unit is not None
 	assert product.emission_factor.activity_unit is not None
 	assert product.co2_purchase is not None
- 
-def test_estimate_category_4_emissions(distance_estimation_filter, product):
-	pipeline = Pipeline[Product](
-		distance_estimation_filter
-	)
-
-	pipeline(product)
-
-	assert product.delivery_distance is not None
-	# assert product.co2_transport is not None
