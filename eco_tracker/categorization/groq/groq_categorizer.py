@@ -5,7 +5,9 @@ import requests
 
 from eco_tracker import api_cache, exceptions
 from eco_tracker.categorization.categorizer_interface import Categorizer
+from eco_tracker.utils.log import get_logger
 
+logger = get_logger(__name__)
 
 class ClimatiqCategorizer(Categorizer):
 	def __init__(self, llm_api_key: str):

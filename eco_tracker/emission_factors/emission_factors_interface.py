@@ -1,13 +1,8 @@
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-@dataclass
-class EmissionFactor:
-	co2e: float
-	co2e_unit: str
-	activity_unit: str
-	name: str
-	description: str
+from eco_tracker.product import EmissionFactor
+
 
 class EmissionFactorsFetcher(ABC):
 

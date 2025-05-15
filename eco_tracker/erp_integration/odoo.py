@@ -133,10 +133,9 @@ class Odoo(DataFetcher):
             # Clean address
             address = self.get_supplier_address(item['id'])
             address = address[0]
-            standardized_address = product.SupplierAddress(
+            standardized_address = product.Address(
                 street = re.split(r'\s{2,}', address['street'])[1], # remove the company name from street address by splitting on 2+ spaces
                 city = address['city'],
-                state = None,
                 zip = address['zip'],
                 country = address['country_id']
             )
@@ -152,13 +151,30 @@ class Odoo(DataFetcher):
                     unit_price = item['price_unit'],
                     supplier = item['partner_id'][1],
                     supplier_address= standardized_address,
+                    delivery_address = product.Address(
+                        street = "Stadtwerkestr. 2",
+                        city = "Amstetten",
+                        zip = "3300",
+                        country = "AT"
+                    ),
                     climatiq_categories = [],
                     climatiq_matched_category = None,
                     category = None,
                     emission_factor = None,
+                    delivery_emission_factor = None,
                     delivery_distance = 0,
+                    weight = 0,
+                    delivery_transportation_type = None,
                     co2_purchase = 0,
-                    co2_transport = 0
+                    co2_transport = 0,
+                    failed_steps = product.FailedSteps(
+                        estimate_categories = False,
+                        emission_factor_fetching = False,
+                        purchase_co2_calculation = False,
+                        distance_estimation = False,
+                        weight_estimation = False,
+                        delivery_emissions_estimation = False
+                    )
                 )
             data.data.append(standardized_item)
 

@@ -5,10 +5,13 @@ import json
 
 from eco_tracker.emission_factors import exceptions
 from eco_tracker.emission_factors.climatiq.unit import return_unit
-from eco_tracker.emission_factors.emission_factors_interface import EmissionFactor, EmissionFactorsFetcher
+from eco_tracker.emission_factors.emission_factors_interface import EmissionFactorsFetcher
 from eco_tracker.emission_factors.exceptions import EmissionFactorInfoNotFound
 from eco_tracker import api_cache
+from eco_tracker.product import EmissionFactor
+from eco_tracker.utils.log import get_logger
 
+logger = get_logger(__name__)
 
 @dataclass
 class EmissionFactorInfo:
@@ -74,7 +77,12 @@ class Climatiq(EmissionFactorsFetcher):
             "unit_type": unit_type
         }
 
-        found_emission_factors = requests.get(url, params=query_params, headers=self.authorization_headers).json()
+        response = requests.get(url, params=query_params, headers=self.authorization_headers)
+        if not response.ok:
+            logger.error(f"Climatiq API returned error code for query: {query_params}")
+            raise EmissionFactorInfoNotFound(query)
+        
+        found_emission_factors = response.json()
         if found_emission_factors['total_results'] == 0:
             raise EmissionFactorInfoNotFound(query)
 

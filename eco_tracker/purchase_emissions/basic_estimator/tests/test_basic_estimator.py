@@ -2,8 +2,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from eco_tracker.emission_factors.emission_factors_interface import EmissionFactor
-from eco_tracker.product import Product
+from eco_tracker.product import EmissionFactor, Product
 from eco_tracker.purchase_emissions.basic_estimator.basic_estimator import BasicPurchaseEmissionsEstimator
 from eco_tracker.purchase_emissions.exceptions import NotSupportedMeasurementUnit, PurchaseEmissionFactorNotSet
 
