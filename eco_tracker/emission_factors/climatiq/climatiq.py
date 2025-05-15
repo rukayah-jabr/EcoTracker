@@ -107,17 +107,16 @@ class Climatiq(EmissionFactorsFetcher):
 
         set_correct_unit_in_req_body(ef_info.unit_type, req_body)
 
-        # Check for cached API response and use if exists; otherwise make fresh call and save to cache
-        cache = api_cache.cached_api_call(url, json.dumps(req_body))
-        if cache == None:
-            response = requests.post(url, json=req_body, headers=self.authorization_headers)
+        @api_cache.execute_or_get_from_cache(url=url, request=json.dumps(req_body))
+        def fetch_estimate(body: dict) -> list:
+            response = requests.post(url, json=body, headers=self.authorization_headers)
             if not response.ok:
                 raise exceptions.EmissionFactorNotFound(ef_info.activity_id)
             
             response_json = response.json()
-            api_cache.save_to_cache(url, json.dumps(req_body), json.dumps(response_json))
-        else:
-            response_json = cache
+            return response_json
+        
+        response_json = fetch_estimate(req_body)
 
         return EmissionFactor(
             co2e=response_json['co2e'],

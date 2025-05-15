@@ -59,10 +59,9 @@ class BreactCategorizer(Categorizer):
 			}
 		}
 
-		# Check for cached API response first; if none, make fresh API call
-		cache = api_cache.cached_api_call(api_url_result, json.dumps(request_data))
-		if cache == None:
-			response_post = requests.post(api_url_classifier, json=request_data, headers=self.headers)
+		@api_cache.execute_or_get_from_cache(url=api_url_result, request=json.dumps(request_data))
+		def fetch_response(body: dict) -> list:
+			response_post = requests.post(api_url_classifier, json=body, headers=self.headers)
 			if response_post.status_code != HTTPStatus.OK:
 				raise exceptions.HTTPException(response_post.status_code, response_post.text)
 
@@ -74,11 +73,9 @@ class BreactCategorizer(Categorizer):
 			get_url = f'{api_url_result}/{process_id}?access_token={access_token}'
 			get_response_data = self._poll_for_result(get_url)
 
-			# Save response to API cache
-			api_cache.save_to_cache(api_url_result, json.dumps(request_data), json.dumps(get_response_data.get("result", {}).get("result", {})))
 			return get_response_data.get("result", {}).get("result", {})
-		else:
-			return cache
+
+		return fetch_response(request_data)
 
 	def _poll_for_result(self, url: str, timeout: int = 30, interval: int = 2) -> dict:
 		start_time = time.time()
