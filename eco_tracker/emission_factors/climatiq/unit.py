@@ -3,7 +3,7 @@
 from eco_tracker.emission_factors.exceptions import UnsupportedUnit
 
 
-def return_unit(unit_type: str) -> dict[str, str] | None:
+def return_unit(unit_type: str) -> dict[str, str]:
 
 	match unit_type.lower():
 		case "area":
@@ -81,7 +81,5 @@ def return_unit(unit_type: str) -> dict[str, str] | None:
 				'time_unit': 'hour',
 				'weight_unit': 'kg'
 			}
-		case "":
-			return None
 
 	raise UnsupportedUnit(unit_type)

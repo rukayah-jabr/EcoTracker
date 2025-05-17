@@ -1,10 +1,10 @@
 
 from eco_tracker.emission_factors_transportation.emission_factors_transportation_interface import EmissionFactorsTransportationFetcher
-from eco_tracker.pipeline import NextStep
+from eco_tracker.pipeline import NextStep, PipelineStep
 from eco_tracker.product import Product
 
 
-class EmissionFactorsTransportationFilter:
+class EmissionFactorsTransportationFilter(PipelineStep):
 
     def __init__(self, emission_factors_transportation: EmissionFactorsTransportationFetcher):
         self.emission_factors_transportation = emission_factors_transportation

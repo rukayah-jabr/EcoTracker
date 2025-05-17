@@ -1,11 +1,11 @@
-from eco_tracker.pipeline import NextStep
+from eco_tracker.pipeline import NextStep, PipelineStep
 from eco_tracker.product import Product
 from eco_tracker.purchase_emissions.purchase_estimator_interface import PurchaseEmissionsEstimator
 from eco_tracker.utils.log import get_logger
 
 logger = get_logger(__name__)
 
-class PurchaseEmissionsEstimatorFilter:
+class PurchaseEmissionsEstimatorFilter(PipelineStep):
 
     def __init__(self, estimator: PurchaseEmissionsEstimator):
         self.estimator = estimator

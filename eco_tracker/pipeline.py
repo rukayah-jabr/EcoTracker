@@ -1,17 +1,17 @@
 
 from abc import abstractmethod
-from typing import Protocol, TypeVar, Callable, Iterable, Union, List, Optional
+from typing import Callable, List, Optional, Protocol, TypeVar
 
 Context = TypeVar('Context')
 # NextStep is a function that takes a context and returns an iterable of contexts or exceptions
 # It has the same signature as the PipelineCursor.__call__ method
-NextStep = Callable[[Context], Iterable[Union[Exception, Context]]]
+NextStep = Callable[[Context], None]
 ErrorHandler = Callable[[Exception, Context, NextStep], None]
 
 class PipelineStep[Context](Protocol):
 	@abstractmethod
 	def __call__(
-		self, context: Context, next_step: NextStep[Context]
+		self, context: Context, next_step: NextStep
 	) -> None:
 		...
 
@@ -25,7 +25,7 @@ class PipelineCursor[Context]:
 		if not self.steps:
 			return
 
-		current_step = self.steps[0]
+		current_step: PipelineStep = self.steps[0] # We get pipeline step
 		next_step = PipelineCursor(self.steps[1:], self.error_handler)
 
 		try:

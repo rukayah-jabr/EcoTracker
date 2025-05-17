@@ -1,12 +1,12 @@
 
 from eco_tracker.distance_estimation.distance_estimation_interface import DistanceEstimator
-from eco_tracker.pipeline import NextStep
+from eco_tracker.pipeline import NextStep, PipelineStep
 from eco_tracker.product import Product
 from eco_tracker.utils.log import get_logger
 
 logger = get_logger(__name__)
 
-class DistanceEstimationFilter:
+class DistanceEstimationFilter(PipelineStep):
   
   def __init__(self, distance_estimator: DistanceEstimator):
     self.distance_estimator = distance_estimator

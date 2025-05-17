@@ -40,8 +40,20 @@ BREACT_API_KEY=os.getenv("BREACT_API_KEY")
 OPEN_ROUTE_SERVICE_API_KEY=os.getenv("OPEN_ROUTE_SERVICE_API_KEY")
 
 def main():
+    
+    if not CLIMATIQ_API_KEY:
+        raise ValueError("CLIMATIQ_API_KEY is not set")
 
-    odoo: DataFetcher = Odoo()
+    if not LLM_API_KEY:
+        raise ValueError("LLM_API_KEY is not set")
+
+    if not BREACT_API_KEY:
+        raise ValueError("BREACT_API_KEY is not set")
+
+    if not OPEN_ROUTE_SERVICE_API_KEY:
+        raise ValueError("OPEN_ROUTE_SERVICE_API_KEY is not set")
+
+    odoo: DataFetcher = Odoo()    
     groq_categorizer: Categorizer = ClimatiqCategorizer(LLM_API_KEY)
     breact_categorizer: Categorizer = BreactCategorizer(BREACT_API_KEY)
     climatiq: EmissionFactorsFetcher = Climatiq(CLIMATIQ_API_KEY)
@@ -53,7 +65,7 @@ def main():
     distance_based_method: DistanceBasedMethod = DistanceBasedMethod()
 
     # Define product pipeline
-    pipeline = Pipeline[Product](
+    pipeline: Pipeline[Product] = Pipeline(
         ClimatiqCategorizerFilter(groq_categorizer),
         CategoryReorderStep(breact_categorizer),
         EmissionFactorsFilter(climatiq, "^21"),
@@ -66,17 +78,17 @@ def main():
     )
 
     # Get data
-    OdooData = FetchDataFilter(odoo)
-    OdooData()
+    odoo_data = FetchDataFilter(odoo)
+    odoo_data()
 
-    # Run pipline over each item in data
+    # Run pipeline over each item in data
     # TODO: adapt the FetchDataFilter to work within the pipeline?
 
-    if OdooData.data is None:
+    if odoo_data.data is None:
         logger.error("No products found in Odoo data")
         raise ValueError("No products found")
 
-    for index, product in enumerate(OdooData.data):
+    for index, product in enumerate(odoo_data.data):
         if index == 2: # limit for testing purposes
             break
 
@@ -93,7 +105,7 @@ def main():
         breact_categories = breact_categorizer.generate_categorization(product.description)
         print(f"[Breact] Categorization for '{product.description}': {breact_categories[0]}")
         breact_confidence = breact_categorizer.get_confidence_for_class(product.description, breact_categories[0])
-        print(f"[Breact] Conficende for '{breact_categories[0]}': {breact_confidence}")
+        print(f"[Breact] Confidence for '{breact_categories[0]}': {breact_confidence}")
 
         print("Purchase emissions:", product.co2_purchase)
         # show cleaned supplier addresses and get distance calculation

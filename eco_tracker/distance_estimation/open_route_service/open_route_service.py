@@ -18,7 +18,7 @@ class OpenRouteService(DistanceEstimator):
         :return: Distance in kilometers
         """
         try:
-            route = self.client.directions(
+            route = self.client.directions( # type: ignore
                 coordinates=[start, end],
                 profile='driving-car',  # Alternatives: 'cycling-regular', 'foot-walking', etc.
                 format='geojson'
@@ -36,7 +36,7 @@ class OpenRouteService(DistanceEstimator):
         :return: List of coordinates, latitude and longitude
         """
         try:
-            geocode = self.client.pelias_search(text=address)
+            geocode = self.client.pelias_search(text=address) # type: ignore
 
             if len(geocode['features']) < 3: # only calculate accurate address with 1-2 addresses
                 coords = geocode['features'][0]['geometry']['coordinates']
@@ -60,7 +60,7 @@ class OpenRouteService(DistanceEstimator):
         distance = None
 
         if start and end:
-            if not start == end: # check if coordinates are the same
+            if start != end: # check if coordinates are the same
                 distance = self.get_route_distance(start, end)
             else:
                 distance = 0

@@ -1,12 +1,11 @@
-from pipeline import NextStep
-from product import Product
-
+from eco_tracker.pipeline import NextStep, PipelineStep
+from eco_tracker.product import Product
 from eco_tracker.utils.log import get_logger
 from eco_tracker.weight_estimation.weight_estimation_interface import WeightEstimator
 
 logger = get_logger(__name__)
 
-class WeightEstimationFilter:
+class WeightEstimationFilter(PipelineStep):
 
   def __init__(self, weight_estimator: WeightEstimator):
     self.weight_estimator = weight_estimator
