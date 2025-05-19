@@ -1,4 +1,3 @@
-import json
 from http import HTTPStatus
 
 import requests
@@ -38,7 +37,7 @@ class ClimatiqCategorizer(Categorizer):
 			}]
 		}
   
-		@api_cache.execute_or_get_from_cache(url=url, request=product)
+		@api_cache.execute_or_get_from_cache(url=url, request=body)
 		def fetch_categories(body: dict) -> list:
 			response = requests.post(url, json=body, headers=self.authorization_headers)
 			if response.status_code != HTTPStatus.OK:

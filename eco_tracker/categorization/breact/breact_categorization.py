@@ -61,7 +61,7 @@ class BreactCategorizer(Categorizer):
 		}
 
 		@api_cache.execute_or_get_from_cache(url=api_url_result, request=json.dumps(request_data))
-		def fetch_response(body: dict) -> list:
+		def fetch_response(body: dict) -> dict:
 			response_post = requests.post(api_url_classifier, json=body, headers=self.headers)
 			if response_post.status_code != HTTPStatus.OK:
 				raise exceptions.HTTPException(response_post.status_code, response_post.text)

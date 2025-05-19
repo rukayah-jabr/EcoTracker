@@ -1,5 +1,6 @@
 import hashlib
 import json
+import os
 import sqlite3
 from collections.abc import Callable
 from datetime import datetime, timedelta
@@ -8,7 +9,8 @@ from datetime import datetime, timedelta
 CACHE_EXPIRY_SECONDS = 2592000
 
 # Connect to SQLite DB (creates it if it doesn't exist)
-conn = sqlite3.connect("api_cache.db")
+db_path = os.path.join(os.path.dirname(__file__), "api_cache.db")
+conn = sqlite3.connect(db_path)
 cursor = conn.cursor()
 
 # Create the cache table

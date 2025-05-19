@@ -116,7 +116,7 @@ class Climatiq(EmissionFactorsFetcher):
         set_correct_unit_in_req_body(ef_info.unit_type, req_body)
 
         @api_cache.execute_or_get_from_cache(url=url, request=json.dumps(req_body))
-        def fetch_estimate(body: dict) -> list:
+        def fetch_estimate(body: dict) -> dict:
             response = requests.post(url, json=body, headers=self.authorization_headers)
             if not response.ok:
                 raise exceptions.EmissionFactorNotFound(ef_info.activity_id)
