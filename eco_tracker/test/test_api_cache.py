@@ -1,11 +1,26 @@
-import sqlite3
 import json
+import sqlite3
+
 import pytest
+
 from eco_tracker import api_cache
 
 url = "http://test-api-call.com/api"
 request = "Test Request"
 response = ["this", "is", "a", "test"]
+
+def test_get_db_connection():
+    db_connection = api_cache.get_db_connection()
+    cursor = db_connection.cursor()
+    cursor.execute("SELECT 1")
+    row = cursor.fetchone()
+    assert row is not None
+    
+def test_get_db_cursor():
+    with api_cache.get_db_cursor() as cursor:
+        cursor.execute("SELECT 1")
+        row = cursor.fetchone()
+        assert row is not None
 
 def test_generate_cache_key():
     assert api_cache.generate_cache_key(url, request) is not None

@@ -53,7 +53,7 @@ def main():
     if not OPEN_ROUTE_SERVICE_API_KEY:
         raise ValueError("OPEN_ROUTE_SERVICE_API_KEY is not set")
 
-    odoo: DataFetcher = Odoo()    
+    odoo: DataFetcher = Odoo(api_base_url="http://localhost:8069")    
     groq_categorizer: Categorizer = ClimatiqCategorizer(LLM_API_KEY)
     breact_categorizer: Categorizer = BreactCategorizer(BREACT_API_KEY)
     climatiq: EmissionFactorsFetcher = Climatiq(CLIMATIQ_API_KEY)
@@ -78,8 +78,7 @@ def main():
     )
 
     # Get data
-    odoo_data = FetchDataFilter(odoo)
-    odoo_data()
+    odoo_data = odoo.fetch_data_from_source()
 
     # Run pipeline over each item in data
     # TODO: adapt the FetchDataFilter to work within the pipeline?

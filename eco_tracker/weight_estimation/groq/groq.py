@@ -5,8 +5,9 @@ from http import HTTPStatus
 
 import requests
 from pydantic import BaseModel
-from weight_estimation.exceptions import WeightEstimationFailed
-from weight_estimation.weight_estimation_interface import WeightEstimator
+
+from eco_tracker.weight_estimation.exceptions import WeightEstimationFailed
+from eco_tracker.weight_estimation.weight_estimation_interface import WeightEstimator
 
 
 @dataclass

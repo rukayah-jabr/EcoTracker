@@ -31,14 +31,17 @@ def test_generate_categorization_success(llm_client):
         assert 1 <= len(category.split(" ")) <= 3
 
 
-def test_generate_categorization_http_error(llm_client):
-    with patch('requests.post') as mock_post:
-        mock_response = Mock()
-        mock_response.status_code = 500
-        mock_response.text = "Server Error"
-        mock_post.return_value = mock_response
-        
-        with pytest.raises(exceptions.HTTPException) as exc_info:
-            llm_client.generate_categorization(product="TestProduct", num_of_categories=15)
-        
-        assert exc_info.value.status_code == 500
+@patch('requests.post')
+@patch('eco_tracker.api_cache.cached_api_call')
+def test_generate_categorization_http_error(mock_cached_api_call, mock_post, llm_client):
+    mock_cached_api_call.return_value = None
+    
+    mock_response = Mock()
+    mock_response.status_code = 500
+    mock_response.text = "Server Error"
+    mock_post.return_value = mock_response
+    
+    with pytest.raises(exceptions.HTTPException) as exc_info:
+        llm_client.generate_categorization(product="TestProduct", num_of_categories=15)
+    
+    assert exc_info.value.status_code == 500

@@ -1,5 +1,6 @@
 import os
 import re
+from datetime import datetime
 
 import requests
 from dotenv import load_dotenv
@@ -11,7 +12,7 @@ from eco_tracker.erp_integration.fetch_data_interface import Data, DataFetcher
 load_dotenv()
 
 class Odoo(DataFetcher):
-    def __init__(self):
+    def __init__(self, api_base_url: str):
         # Odoo database authorization fields
         self.database = "ecotracker"
         self.username = 'admin'
@@ -21,7 +22,7 @@ class Odoo(DataFetcher):
         # Odoo API request settings; session_id is provided from
         # successful authorization and is REQUIRED to make requests
         self.session_id = None
-        self.api_base_url = 'http://localhost:8069'
+        self.api_base_url = api_base_url
         self.headers= {"Content-Type": "application/json"}
 
     def authenticate(self) -> bool:
@@ -46,7 +47,7 @@ class Odoo(DataFetcher):
         print(f"Authenticated with session ID: {self.session_id}")
         return True
 
-    def get_items(self) -> list:
+    def get_items(self, start_date: datetime | None = None, end_date: datetime | None = None) -> list:
         url = self.api_base_url + "/web/dataset/call_kw/stock.move/search_read"
         data = {
             "jsonrpc": "2.0",
@@ -70,7 +71,21 @@ class Odoo(DataFetcher):
 
         # Parse result and return list of delivered items
         result = response.json()
-        return result['result']
+        result = result['result']
+        
+        result = self._filter_by_date(result, start_date, end_date)
+        
+        return result
+    
+    def _filter_by_date(self, items: list, start_date: datetime | None, end_date: datetime | None) -> list:
+        if start_date:
+            start_date_str = start_date.strftime("%Y-%m-%d")
+            items = list(filter(lambda item: item['date'] >= start_date_str, items))
+        if end_date:
+            end_date_str = end_date.strftime("%Y-%m-%d")
+            items = list(filter(lambda item: item['date'] <= end_date_str, items))
+        
+        return items
 
     def get_supplier_address(self, supplier_id: int) -> list:
         url = self.api_base_url + "/web/dataset/call_kw/res.partner/search_read"
@@ -118,14 +133,14 @@ class Odoo(DataFetcher):
         raise NotImplementedError
 
     # Implemented function used in FetchDataFilter
-    def fetch_data_from_source(self) -> Data:
+    def fetch_data_from_source(self, start_date: datetime | None = None, end_date: datetime | None = None) -> Data:
         self.authenticate()
 
         # Initialize empty data object
         data = Data("odoo", [])
 
         # Get data
-        results = self.get_items()
+        results = self.get_items(start_date, end_date)
 
         # Standardize data to match product schema
         for item in results:
@@ -146,7 +161,7 @@ class Odoo(DataFetcher):
             standardized_item = product.Product(
                     delivered_date = item['date'],
                     description = item['name'],
-                    unit = unit,
+                    unit = unit or "number",
                     quantity = item['product_uom_qty'],
                     unit_price = item['price_unit'],
                     supplier = item['partner_id'][1],

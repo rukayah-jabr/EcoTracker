@@ -74,12 +74,14 @@ def test_fetch_emission_factor_info_no_results(climatiq_instance):
         with pytest.raises(EmissionFactorInfoNotFound):
             climatiq_instance.fetch_emission_factor_info(query="laptop", unit_type="Number", data_version="^21")
 
-def test_fetch_emission_factor_error_code(climatiq_instance, emission_factor_info):
-    with patch('requests.post') as mock_post:
-        mock_post.return_value.status_code = 400
-        mock_post.return_value.ok = False
-        with pytest.raises(EmissionFactorNotFound):
-            climatiq_instance.fetch_emission_factor(emission_factor_info)
+@patch('eco_tracker.api_cache.cached_api_call')
+@patch('requests.post')
+def test_fetch_emission_factor_error_code(mock_post, mock_cached_api_call, climatiq_instance, emission_factor_info):
+    mock_cached_api_call.return_value = None
+    mock_post.return_value.status_code = 400
+    mock_post.return_value.ok = False
+    with pytest.raises(EmissionFactorNotFound):
+        climatiq_instance.fetch_emission_factor(emission_factor_info)
             
 def test_fetch_emission_factor_factor_not_found(climatiq_instance, emission_factor_info):
     emission_factor_info.activity_id = 'not-correct'
