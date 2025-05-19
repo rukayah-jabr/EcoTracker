@@ -1,9 +1,9 @@
 from eco_tracker.categorization.breact.breact_categorization import BreactCategorizer
-from eco_tracker.pipeline import NextStep
+from eco_tracker.pipeline import NextStep, PipelineStep
 from eco_tracker.product import Product
 
 
-class CategoryReorderStep:
+class CategoryReorderStep(PipelineStep):
     def __init__(self, categorizer: BreactCategorizer):
         self.categorizer = categorizer
 

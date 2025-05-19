@@ -1,12 +1,12 @@
 from eco_tracker.emission_factors.emission_factors_interface import EmissionFactorsFetcher
 from eco_tracker.emission_factors.exceptions import EmissionFactorNotFound, EmissionFactorNotFoundForProduct
-from eco_tracker.pipeline import NextStep
+from eco_tracker.pipeline import NextStep, PipelineStep
 from eco_tracker.product import Product
 from eco_tracker.utils.log import get_logger
 
 logger = get_logger(__name__)
 
-class EmissionFactorsFilter:
+class EmissionFactorsFilter(PipelineStep):
 
 	def __init__(self, emission_factors_fetcher: EmissionFactorsFetcher, data_version: str):
 		self.emission_factors_fetcher = emission_factors_fetcher

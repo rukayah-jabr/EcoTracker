@@ -1,11 +1,11 @@
 from eco_tracker.categorization.categorizer_interface import Categorizer
-from eco_tracker.pipeline import NextStep
+from eco_tracker.pipeline import NextStep, PipelineStep
 from eco_tracker.product import Product
 from eco_tracker.utils.log import get_logger
 
 logger = get_logger(__name__)
 
-class ClimatiqCategorizerFilter:
+class ClimatiqCategorizerFilter(PipelineStep):
 
 	def __init__(self, categorizer: Categorizer, num_of_categories: int = 15):
 		self.categorizer = categorizer
