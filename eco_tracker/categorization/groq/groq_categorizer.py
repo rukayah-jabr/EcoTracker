@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 import requests
 
-from eco_tracker import exceptions
+from eco_tracker import api_cache, exceptions
 from eco_tracker.categorization.categorizer_interface import Categorizer
 from eco_tracker.utils.log import get_logger
 
@@ -36,16 +36,19 @@ class ClimatiqCategorizer(Categorizer):
 				"role": "system",
 			}]
 		}
+  
+		@api_cache.execute_or_get_from_cache(url=url, request=body)
+		def fetch_categories(body: dict) -> list:
+			response = requests.post(url, json=body, headers=self.authorization_headers)
+			if response.status_code != HTTPStatus.OK:
+				raise exceptions.HTTPException(response.status_code, response.text)
 
-		response = requests.post(url, json=body, headers=self.authorization_headers)
-		if response.status_code != HTTPStatus.OK:
-			logger.error(f"Failed to generate categorization for product {product}: {response.status_code} {response.text}")
-			raise exceptions.HTTPException(response.status_code, response.text)
-
-		body = response.json()
-		response_message = body['choices'][0]['message']['content']
-		categories = parse_generated_categories(response_message)
-		return categories
+			body = response.json()
+			response_message = body['choices'][0]['message']['content']
+			categories = parse_generated_categories(response_message)
+			return categories
+ 
+		return fetch_categories(body)
 
 def parse_generated_categories(llm_categories: str) -> list:
 	categories = []

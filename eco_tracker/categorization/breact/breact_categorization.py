@@ -2,9 +2,11 @@ import time
 from http import HTTPStatus
 
 import requests
+import json
 
 from eco_tracker import exceptions
 from eco_tracker.categorization.categorizer_interface import Categorizer
+from eco_tracker import api_cache
 
 
 class BreactCategorizer(Categorizer):
@@ -58,19 +60,23 @@ class BreactCategorizer(Categorizer):
 			}
 		}
 
-		response_post = requests.post(api_url_classifier, json=request_data, headers=self.headers)
-		if response_post.status_code != HTTPStatus.OK:
-			raise exceptions.HTTPException(response_post.status_code, response_post.text)
+		@api_cache.execute_or_get_from_cache(url=api_url_result, request=json.dumps(request_data))
+		def fetch_response(body: dict) -> dict:
+			response_post = requests.post(api_url_classifier, json=body, headers=self.headers)
+			if response_post.status_code != HTTPStatus.OK:
+				raise exceptions.HTTPException(response_post.status_code, response_post.text)
 
-		# Parse response from post to extract access_token and process_id
-		post_response_data = response_post.json()
-		access_token = post_response_data.get('access_token')
-		process_id = post_response_data.get('process_id')
+			# Parse response from post to extract access_token and process_id
+			post_response_data = response_post.json()
+			access_token = post_response_data.get('access_token')
+			process_id = post_response_data.get('process_id')
 
-		get_url = f'{api_url_result}/{process_id}?access_token={access_token}'
-		get_response_data = self._poll_for_result(get_url)
+			get_url = f'{api_url_result}/{process_id}?access_token={access_token}'
+			get_response_data = self._poll_for_result(get_url)
 
-		return get_response_data.get("result", {}).get("result", {})
+			return get_response_data.get("result", {}).get("result", {})
+
+		return fetch_response(request_data)
 
 	def _poll_for_result(self, url: str, timeout: int = 30, interval: float = 0.5) -> dict:
 		start_time = time.time()
