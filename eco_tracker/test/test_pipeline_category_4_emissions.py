@@ -2,7 +2,7 @@ import os
 from datetime import date
 
 import pytest
-from delivery_emissions.delivery_emissions_estimator_filter import DeliveryEmissionsEstimatorFilter
+from eco_tracker.delivery_emissions.delivery_emissions_estimator_filter import DeliveryEmissionsEstimatorFilter
 from dotenv import load_dotenv
 
 from eco_tracker.delivery_emissions.distance_based_method.distance_based_method import DistanceBasedMethod

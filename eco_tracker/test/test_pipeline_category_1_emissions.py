@@ -1,5 +1,6 @@
 import os
 from datetime import date
+from unittest.mock import MagicMock
 
 import pytest
 from dotenv import load_dotenv
@@ -36,11 +37,9 @@ def categorizer():
 
 @pytest.fixture
 def breact_categorizer():
-	load_dotenv()
-	breact_api_key = os.getenv("BREACT_API_KEY")
-	if not breact_api_key:
-		raise ValueError("BREACT_API_KEY is not set")
-	return BreactCategorizer(breact_api_key)
+    mock = MagicMock()
+    mock.get_confidence_for_class.return_value = 1.0
+    return mock
 
 @pytest.fixture
 def open_route_service():
@@ -55,8 +54,8 @@ def purchase_emissions_estimator():
 	return BasicPurchaseEmissionsEstimator()
 
 @pytest.fixture
-def emission_factors_filter(climatiq) -> EmissionFactorsFilter:
-	return EmissionFactorsFilter(climatiq, "^21")
+def emission_factors_filter(climatiq, breact_categorizer) -> EmissionFactorsFilter:
+	return EmissionFactorsFilter(climatiq, "^21", breact_categorizer)
 
 @pytest.fixture
 def climatiq_categorizer_filter(categorizer) -> ClimatiqCategorizerFilter:
@@ -115,7 +114,7 @@ def product():
 		)
 	)
 
-def test_estimate_category_1_emissions(emission_factors_filter, category_reorder_step, climatiq_categorizer_filter, purchase_emissions_estimator_filter, distance_estimation_filter, product):
+def test_estimate_category_1_emissions(emission_factors_filter, category_reorder_step, climatiq_categorizer_filter, purchase_emissions_estimator_filter, distance_estimation_filter, product, breact_categorizer):
 	pipeline = Pipeline[Product](
 		climatiq_categorizer_filter,
 		category_reorder_step,
