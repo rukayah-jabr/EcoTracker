@@ -98,8 +98,8 @@ def main():
 
         # show returned categories and emissions factors
         print("Product:", product.description)
-        print("Generated categories to match with emission factor (Climatiq):", product.climatiq_categories)
-        print("Matched category with emission factor (Climatiq):", product.climatiq_matched_category if product.climatiq_matched_category else "None") #this should be sorted now
+        print("Generated categories to match with emission factor (Climatiq):", product.estimated_categories)
+        print("Matched category with emission factor (Climatiq):", product.estimated_matched_category if product.estimated_matched_category else "None") #this should be sorted now
         print("Emission factor:", product.emission_factor.name if product.emission_factor else "None")
         print("FE Category:", product.category)
         print("Purchase emissions:", product.co2_purchase)

@@ -13,7 +13,7 @@ class ClimatiqCategorizerFilter(PipelineStep):
 
 	def __call__(self, product: Product, next_step: NextStep) -> None:
 		try:
-			product.climatiq_categories = self.categorizer.generate_categorization(product.description, self.num_of_categories)
+			product.estimated_categories = self.categorizer.generate_categorization(product.description, self.num_of_categories)
 		except Exception as e:
 			logger.error(f"Error while generating estimate categories for product {product.description}: {e}")
 			product.failed_steps.estimate_categories = True

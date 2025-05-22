@@ -8,12 +8,12 @@ class CategoryReorderFilter(PipelineStep):
         self.categorizer = categorizer
 
     def __call__(self, product: Product, next_step: NextStep) -> None:
-        if product.failed_steps.estimate_categories or not product.climatiq_categories: #in case there is no categories
+        if product.failed_steps.estimate_categories or not product.estimated_categories: #in case there is no categories
             next_step(product)
             return
 
         confidences = {}
-        for category in product.climatiq_categories:
+        for category in product.estimated_categories:
             try:
                 confidence = self.categorizer.get_confidence_for_class(product.description, category)
                 if confidence >= 0.7:  # confidence threshold = 0.7, anything lower is discarded
@@ -22,6 +22,6 @@ class CategoryReorderFilter(PipelineStep):
                 confidences[category] = 0.0
 
         sorted_categories = sorted(confidences.items(), key=lambda x: x[1], reverse=True)
-        product.climatiq_categories = [cat for cat, _ in sorted_categories]
+        product.estimated_categories = [cat for cat, _ in sorted_categories]
 
         next_step(product)

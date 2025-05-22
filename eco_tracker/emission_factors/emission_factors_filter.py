@@ -18,11 +18,11 @@ class EmissionFactorsFilter(PipelineStep):
 			next_step(product)
 			return None
 			
-		for category in product.climatiq_categories:
+		for category in product.estimated_categories:
 			try:
 				emission_factor = self.emission_factors_fetcher.fetch_emission_factor_from_query(category, product.unit, self.data_version)
 				product.emission_factor = emission_factor
-				product.climatiq_matched_category = category
+				product.estimated_matched_category = category
 				next_step(product)
 				return None
 			except EmissionFactorNotFound:
@@ -31,6 +31,6 @@ class EmissionFactorsFilter(PipelineStep):
 				logger.error(f"Error fetching emission factor for product {product.description}: {e}")
 				raise e
     
-		logger.error(f"No emission factor found for product {product.description} with categories {product.climatiq_categories}")
+		logger.error(f"No emission factor found for product {product.description} with categories {product.estimated_categories}")
 		product.failed_steps.emission_factor_fetching = True
 		next_step(product)

@@ -64,8 +64,8 @@ def product():
 		unit="number",
 		unit_price=1000.00,
 		quantity=2,
-		climatiq_categories=[],
-		climatiq_matched_category=None,
+		estimated_categories=[],
+		estimated_matched_category=None,
 		category="category",
 		supplier="supplier",
 		supplier_address= Address(

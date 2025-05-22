@@ -87,8 +87,8 @@ def product():
 		unit="number",
 		unit_price=1000.00,
 		quantity=2,
-		climatiq_categories=[],
-		climatiq_matched_category=None,
+		estimated_categories=[],
+		estimated_matched_category=None,
 		category="category",
 		supplier="supplier",
 		supplier_address= Address(
@@ -131,7 +131,7 @@ def test_estimate_category_1_emissions(emission_factors_filter, category_reorder
 
 	pipeline(product)
 
-	assert product.climatiq_categories is not None
+	assert product.estimated_categories is not None
 	assert product.emission_factor.co2e is not None
 	assert product.emission_factor.co2e_unit is not None
 	assert product.emission_factor.activity_unit is not None
