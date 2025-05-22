@@ -114,7 +114,7 @@ def product():
 		)
 	)
 
-def test_estimate_category_1_emissions(emission_factors_filter, category_reorder_step, climatiq_categorizer_filter, purchase_emissions_estimator_filter, distance_estimation_filter, product, breact_categorizer):
+def test_estimate_category_1_emissions(emission_factors_filter, category_reorder_step, climatiq_categorizer_filter, purchase_emissions_estimator_filter, distance_estimation_filter, product):
 	pipeline = Pipeline[Product](
 		climatiq_categorizer_filter,
 		category_reorder_step,
