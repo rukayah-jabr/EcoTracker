@@ -22,11 +22,11 @@ class EmissionFactorsFilter(PipelineStep):
 
         for category in product.climatiq_categories:
             try:
-
                 emission_factor = self.emission_factors_fetcher.fetch_emission_factor_from_query(
                     category, product.unit, self.data_version
                 )
-                confidence = self.categorizer.get_confidence_for_class(product.description, category)
+
+                confidence = self.categorizer.get_confidence_for_class(product.description, emission_factor.description)
                 if confidence < 0.7:
                     continue  # Skip low-confidence match
 
