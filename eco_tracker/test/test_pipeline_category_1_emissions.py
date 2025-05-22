@@ -5,6 +5,7 @@ import pytest
 from dotenv import load_dotenv
 
 from eco_tracker.categorization.breact.breact_categorization import BreactCategorizer
+from eco_tracker.categorization.breact.breact_fe_categorization import BreactFECategorizationFilter
 from eco_tracker.categorization.breact.breact_reorder_categorization import CategoryReorderFilter
 from eco_tracker.categorization.climatiq_categorization_filter import ClimatiqCategorizerFilter
 from eco_tracker.categorization.groq.groq_categorizer import ClimatiqCategorizer
@@ -71,6 +72,10 @@ def purchase_emissions_estimator_filter(purchase_emissions_estimator) -> Purchas
 	return PurchaseEmissionsEstimatorFilter(purchase_emissions_estimator)
 
 @pytest.fixture
+def breact_fe_categorization_filter(breact_categorizer) -> BreactFECategorizationFilter:
+	return BreactFECategorizationFilter(breact_categorizer)
+
+@pytest.fixture
 def distance_estimation_filter(open_route_service) -> DistanceEstimationFilter:
 	return DistanceEstimationFilter(open_route_service)
 
@@ -115,11 +120,12 @@ def product():
 		)
 	)
 
-def test_estimate_category_1_emissions(emission_factors_filter, category_reorder_step, climatiq_categorizer_filter, purchase_emissions_estimator_filter, distance_estimation_filter, product):
+def test_estimate_category_1_emissions(emission_factors_filter, category_reorder_step, climatiq_categorizer_filter, purchase_emissions_estimator_filter, breact_fe_categorization_filter, distance_estimation_filter, product):
 	pipeline = Pipeline[Product](
 		climatiq_categorizer_filter,
 		category_reorder_step,
 		emission_factors_filter,
+		breact_fe_categorization_filter,
 		purchase_emissions_estimator_filter
 	)
 
@@ -129,4 +135,5 @@ def test_estimate_category_1_emissions(emission_factors_filter, category_reorder
 	assert product.emission_factor.co2e is not None
 	assert product.emission_factor.co2e_unit is not None
 	assert product.emission_factor.activity_unit is not None
+	assert product.category is not None and product.category != ""
 	assert product.co2_purchase is not None
