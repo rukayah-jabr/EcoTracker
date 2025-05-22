@@ -55,7 +55,7 @@ class FullPipeline:
         pipeline: Pipeline[Product] = Pipeline(
             ClimatiqCategorizerFilter(groq_categorizer),
             CategoryReorderStep(breact_categorizer),
-            EmissionFactorsFilter(climatiq, "^21"),
+            EmissionFactorsFilter(climatiq, "^21", breact_categorizer),
             PurchaseEmissionsEstimatorFilter(basic_purchase_estimator),
             
             DistanceEstimationFilter(open_route_distance_estimator),
