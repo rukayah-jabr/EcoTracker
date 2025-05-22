@@ -3,7 +3,7 @@ from eco_tracker.pipeline import NextStep, PipelineStep
 from eco_tracker.product import Product
 
 
-class CategoryReorderStep(PipelineStep):
+class CategoryReorderFilter(PipelineStep):
     def __init__(self, categorizer: BreactCategorizer):
         self.categorizer = categorizer
 

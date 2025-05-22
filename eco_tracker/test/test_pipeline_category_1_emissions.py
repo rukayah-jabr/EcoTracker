@@ -5,7 +5,7 @@ import pytest
 from dotenv import load_dotenv
 
 from eco_tracker.categorization.breact.breact_categorization import BreactCategorizer
-from eco_tracker.categorization.breact.breact_reorder_categorization import CategoryReorderStep
+from eco_tracker.categorization.breact.breact_reorder_categorization import CategoryReorderFilter
 from eco_tracker.categorization.climatiq_categorization_filter import ClimatiqCategorizerFilter
 from eco_tracker.categorization.groq.groq_categorizer import ClimatiqCategorizer
 from eco_tracker.distance_estimation.distance_estimation_filter import DistanceEstimationFilter
@@ -63,8 +63,8 @@ def climatiq_categorizer_filter(categorizer) -> ClimatiqCategorizerFilter:
 	return ClimatiqCategorizerFilter(categorizer)
 
 @pytest.fixture
-def category_reorder_step(breact_categorizer) -> CategoryReorderStep:
-	return CategoryReorderStep(breact_categorizer)
+def category_reorder_step(breact_categorizer) -> CategoryReorderFilter:
+	return CategoryReorderFilter(breact_categorizer)
 
 @pytest.fixture
 def purchase_emissions_estimator_filter(purchase_emissions_estimator) -> PurchaseEmissionsEstimatorFilter:

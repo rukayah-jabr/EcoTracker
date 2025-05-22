@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from eco_tracker.categorization.breact.breact_categorization import BreactCategorizer
-from eco_tracker.categorization.breact.breact_reorder_categorization import CategoryReorderStep
+from eco_tracker.categorization.breact.breact_reorder_categorization import CategoryReorderFilter
 from eco_tracker.product import Address, FailedSteps, Product
 
 
@@ -51,7 +51,7 @@ def test_category_reorder_step_reorders_by_confidence(mock_breact_categorizer):
     )
 
     next_step = MagicMock()  # fake a call to check later
-    reorder_step = CategoryReorderStep(mock_breact_categorizer)
+    reorder_step = CategoryReorderFilter(mock_breact_categorizer)
 
     reorder_step(product, next_step)
 
