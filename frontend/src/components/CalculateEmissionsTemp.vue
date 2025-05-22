@@ -3,8 +3,8 @@
     <h3 class="border-t pt-5">Temporary test of API fetch and and data return</h3>
     <ul class="ml-5 my-3">
       <li><b>2024-08-02</b> to <b>2024-08-02:</b> 2 entries</li>
-      <li><b>2024-08-02</b> to <b>2024-08-05:</b> 3 entires</li>
-      <li><b>2024-08-02</b> to <b>2024-08-08:</b> 9 entries</li>
+      <li><b>2024-08-02</b> to <b>2024-08-05:</b> 8 entires</li>
+      <li><b>2024-08-02</b> to <b>2024-08-09:</b> 18 entries</li>
     </ul>
 
     <div class="d-flex mt-5">
@@ -17,7 +17,7 @@
     ></v-date-input>
     <div class="my-3">
       <v-btn color="primary" @click="loadData" :loading="loading">
-        Calculate Emissions (Test)
+        Calculate Emissions
       </v-btn>
   
       <div v-if="error" class="error">
@@ -65,7 +65,6 @@
             <td><b>{{ record.co2_purchase.toFixed(3) }}</b></td>
             <td><b>{{ record.co2_transport.toFixed(3) }}</b></td>
             <td v-for="(value, key) in record.failed_steps" :key="key">
-              <!-- Did the step succeed? (failed = false) -->
                <component :is="getStepStatusIcon(value)"/>
             </td>
           </tr>
@@ -94,9 +93,11 @@ const dateRange = ref<Date[]>([initialStart, initialEnd])
 async function loadData() {
   loading.value = true
   error.value = ''
-  const start = dateRange.value[0].toISOString().split('T')[0]
-  const end = dateRange.value[dateRange.value.length - 1].toISOString().split('T')[0]
-  console.log(start + " - " + end)
+
+  let start = formatDateToYMD(dateRange.value[0])
+  let end = formatDateToYMD(dateRange.value[dateRange.value.length - 1])
+  
+  console.log("Setting date range: " + start + " to " + end)
 
   try {
     const fetchUrl = "http://localhost:8069" + "&start_date=" + start + "&end_date=" + end
@@ -105,7 +106,6 @@ async function loadData() {
     error.value = err.message || 'Failed to fetch data'
   } finally {
     loading.value = false
-    console.log(records)
     console.log(records.value)
   }
 }
@@ -117,6 +117,15 @@ function getStepStatusIcon(value:boolean) {
 
   return h(VIcon, { icon: iconName, color: iconColor })
 }
+
+// Manual function to format date since using .toISOString causes issues (using day before)
+function formatDateToYMD(date: Date): string {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0') // Months are 0-based
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 </script>
 
 <style scoped>
