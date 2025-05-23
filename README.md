@@ -10,6 +10,8 @@
   - [openrouteservice](https://openrouteservice.org/)
 - get API Key from Groq - LLM for categorization
   - [groq](https://console.groq.com/keys)
+- get API KEY from Breact - LLM for classifying
+  - [breact] (https://breact.ai/home/api-keys).
 
 ### Create a `.env` file
 - copy the `.env.example` file and rename it to `.env`
