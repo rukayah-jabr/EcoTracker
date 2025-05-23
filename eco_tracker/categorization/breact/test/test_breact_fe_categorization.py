@@ -1,6 +1,6 @@
 import pytest
 from datetime import date
-from eco_tracker.categorization.breact.breact_fe_categorization import BreactFECategorizationFilter
+from eco_tracker.categorization.breact.breact_fe_categorization_filter import BreactFrontendCategorizationFilter
 from eco_tracker.product import Address, FailedSteps, Product
 
 class MockBreactCategorizer:
@@ -43,7 +43,7 @@ def create_test_product() -> Product:
 
 def test_breact_fe_categorization_assigns_category():
     mock_categorizer = MockBreactCategorizer()
-    filter_step = BreactFECategorizationFilter(mock_categorizer)
+    filter_step = BreactFrontendCategorizationFilter(mock_categorizer)
     product = create_test_product()
 
 
@@ -55,7 +55,7 @@ def test_breact_fe_categorization_assigns_category():
 
 def test_breact_fe_categorization_fallback_on_exception():
     mock_categorizer = FailingMockBreactCategorizer()
-    filter_step = BreactFECategorizationFilter(mock_categorizer)
+    filter_step = BreactFrontendCategorizationFilter(mock_categorizer)
     product = create_test_product()
 
     def dummy_next_step(p): pass

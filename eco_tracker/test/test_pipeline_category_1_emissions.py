@@ -5,8 +5,8 @@ import pytest
 from dotenv import load_dotenv
 
 from eco_tracker.categorization.breact.breact_categorization import BreactCategorizer
-from eco_tracker.categorization.breact.breact_fe_categorization import BreactFECategorizationFilter
-from eco_tracker.categorization.breact.breact_reorder_categorization import CategoryReorderFilter
+from eco_tracker.categorization.breact.breact_fe_categorization_filter import BreactFrontendCategorizationFilter
+from eco_tracker.categorization.breact.breact_reorder_categorization_filter import CategoryReorderFilter
 from eco_tracker.categorization.climatiq_categorization_filter import ClimatiqCategorizerFilter
 from eco_tracker.categorization.groq.groq_categorizer import ClimatiqCategorizer
 from eco_tracker.distance_estimation.distance_estimation_filter import DistanceEstimationFilter
@@ -72,8 +72,8 @@ def purchase_emissions_estimator_filter(purchase_emissions_estimator) -> Purchas
 	return PurchaseEmissionsEstimatorFilter(purchase_emissions_estimator)
 
 @pytest.fixture
-def breact_fe_categorization_filter(breact_categorizer) -> BreactFECategorizationFilter:
-	return BreactFECategorizationFilter(breact_categorizer)
+def breact_fe_categorization_filter(breact_categorizer) -> BreactFrontendCategorizationFilter:
+	return BreactFrontendCategorizationFilter(breact_categorizer)
 
 @pytest.fixture
 def distance_estimation_filter(open_route_service) -> DistanceEstimationFilter:

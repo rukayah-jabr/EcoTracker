@@ -2,7 +2,7 @@ from eco_tracker.pipeline import PipelineStep, NextStep
 from eco_tracker.product import Product
 from eco_tracker.categorization.breact.breact_categorization import BreactCategorizer
 
-class BreactFECategorizationFilter(PipelineStep):
+class BreactFrontendCategorizationFilter(PipelineStep):
     def __init__(self, categorizer: BreactCategorizer):
         self.categorizer = categorizer
 

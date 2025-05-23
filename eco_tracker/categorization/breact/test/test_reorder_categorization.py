@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from eco_tracker.categorization.breact.breact_categorization import BreactCategorizer
-from eco_tracker.categorization.breact.breact_reorder_categorization import CategoryReorderFilter
+from eco_tracker.categorization.breact.breact_reorder_categorization_filter import CategoryReorderFilter
 from eco_tracker.product import Address, FailedSteps, Product
 
 

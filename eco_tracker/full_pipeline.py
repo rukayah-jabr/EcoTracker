@@ -2,8 +2,8 @@ import os
 from datetime import datetime
 
 from eco_tracker.categorization.breact.breact_categorization import BreactCategorizer
-from eco_tracker.categorization.breact.breact_fe_categorization import BreactFECategorizationFilter
-from eco_tracker.categorization.breact.breact_reorder_categorization import CategoryReorderFilter
+from eco_tracker.categorization.breact.breact_fe_categorization_filter import BreactFrontendCategorizationFilter
+from eco_tracker.categorization.breact.breact_reorder_categorization_filter import CategoryReorderFilter
 from eco_tracker.categorization.categorizer_interface import Categorizer
 from eco_tracker.categorization.climatiq_categorization_filter import ClimatiqCategorizerFilter
 from eco_tracker.categorization.groq.groq_categorizer import ClimatiqCategorizer
@@ -57,7 +57,7 @@ class FullPipeline:
             ClimatiqCategorizerFilter(groq_categorizer),
             CategoryReorderFilter(breact_categorizer),
             EmissionFactorsFilter(climatiq, "^21"),
-            BreactFECategorizationFilter(breact_categorizer),
+            BreactFrontendCategorizationFilter(breact_categorizer),
             PurchaseEmissionsEstimatorFilter(basic_purchase_estimator),
             
             DistanceEstimationFilter(open_route_distance_estimator),
