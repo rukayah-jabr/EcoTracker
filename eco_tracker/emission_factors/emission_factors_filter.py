@@ -31,7 +31,7 @@ class EmissionFactorsFilter(PipelineStep):
                     continue  # Skip low-confidence match
 
                 product.emission_factor = emission_factor
-                product.climatiq_matched_category = category
+                product.estimated_matched_category = category
                 next_step(product)
                 return None
 
