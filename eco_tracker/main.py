@@ -69,7 +69,7 @@ def main():
     pipeline: Pipeline[Product] = Pipeline(
         ClimatiqCategorizerFilter(groq_categorizer),
         CategoryReorderFilter(breact_categorizer),
-        EmissionFactorsFilter(climatiq, "^21"),
+        EmissionFactorsFilter(climatiq, "^21", breact_categorizer),
         BreactFrontendCategorizationFilter(breact_categorizer),
         PurchaseEmissionsEstimatorFilter(basic_purchase_estimator),
         
