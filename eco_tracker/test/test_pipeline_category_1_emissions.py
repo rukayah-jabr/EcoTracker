@@ -6,7 +6,8 @@ import pytest
 from dotenv import load_dotenv
 
 from eco_tracker.categorization.breact.breact_categorization import BreactCategorizer
-from eco_tracker.categorization.breact.breact_reorder_categorization import CategoryReorderStep
+from eco_tracker.categorization.breact.breact_fe_categorization_filter import BreactFrontendCategorizationFilter
+from eco_tracker.categorization.breact.breact_reorder_categorization_filter import CategoryReorderFilter
 from eco_tracker.categorization.climatiq_categorization_filter import ClimatiqCategorizerFilter
 from eco_tracker.categorization.groq.groq_categorizer import ClimatiqCategorizer
 from eco_tracker.distance_estimation.distance_estimation_filter import DistanceEstimationFilter
@@ -62,12 +63,16 @@ def climatiq_categorizer_filter(categorizer) -> ClimatiqCategorizerFilter:
 	return ClimatiqCategorizerFilter(categorizer)
 
 @pytest.fixture
-def category_reorder_step(breact_categorizer) -> CategoryReorderStep:
-	return CategoryReorderStep(breact_categorizer)
+def category_reorder_step(breact_categorizer) -> CategoryReorderFilter:
+	return CategoryReorderFilter(breact_categorizer)
 
 @pytest.fixture
 def purchase_emissions_estimator_filter(purchase_emissions_estimator) -> PurchaseEmissionsEstimatorFilter:
 	return PurchaseEmissionsEstimatorFilter(purchase_emissions_estimator)
+
+@pytest.fixture
+def breact_fe_categorization_filter(breact_categorizer) -> BreactFrontendCategorizationFilter:
+	return BreactFrontendCategorizationFilter(breact_categorizer)
 
 @pytest.fixture
 def distance_estimation_filter(open_route_service) -> DistanceEstimationFilter:
@@ -81,8 +86,8 @@ def product():
 		unit="number",
 		unit_price=1000.00,
 		quantity=2,
-		climatiq_categories=[],
-		climatiq_matched_category=None,
+		estimated_categories=[],
+		estimated_matched_category=None,
 		category="category",
 		supplier="supplier",
 		supplier_address= Address(
@@ -114,18 +119,20 @@ def product():
 		)
 	)
 
-def test_estimate_category_1_emissions(emission_factors_filter, category_reorder_step, climatiq_categorizer_filter, purchase_emissions_estimator_filter, distance_estimation_filter, product):
+def test_estimate_category_1_emissions(emission_factors_filter, category_reorder_step, climatiq_categorizer_filter, purchase_emissions_estimator_filter, breact_fe_categorization_filter, distance_estimation_filter, product):
 	pipeline = Pipeline[Product](
 		climatiq_categorizer_filter,
 		category_reorder_step,
 		emission_factors_filter,
+		breact_fe_categorization_filter,
 		purchase_emissions_estimator_filter
 	)
 
 	pipeline(product)
 
-	assert product.climatiq_categories is not None
+	assert product.estimated_categories is not None
 	assert product.emission_factor.co2e is not None
 	assert product.emission_factor.co2e_unit is not None
 	assert product.emission_factor.activity_unit is not None
+	assert product.category is not None and product.category != ""
 	assert product.co2_purchase is not None

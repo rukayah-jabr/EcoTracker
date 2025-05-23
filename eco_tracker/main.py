@@ -3,7 +3,8 @@ import os
 from dotenv import load_dotenv
 
 from eco_tracker.categorization.breact.breact_categorization import BreactCategorizer
-from eco_tracker.categorization.breact.breact_reorder_categorization import CategoryReorderStep
+from eco_tracker.categorization.breact.breact_fe_categorization_filter import BreactFrontendCategorizationFilter
+from eco_tracker.categorization.breact.breact_reorder_categorization_filter import CategoryReorderFilter
 from eco_tracker.categorization.categorizer_interface import Categorizer
 from eco_tracker.categorization.climatiq_categorization_filter import ClimatiqCategorizerFilter
 from eco_tracker.categorization.groq.groq_categorizer import ClimatiqCategorizer
@@ -67,8 +68,9 @@ def main():
     # Define product pipeline
     pipeline: Pipeline[Product] = Pipeline(
         ClimatiqCategorizerFilter(groq_categorizer),
-        CategoryReorderStep(breact_categorizer),
-        EmissionFactorsFilter(climatiq, "^21", breact_categorizer),
+        CategoryReorderFilter(breact_categorizer),
+        EmissionFactorsFilter(climatiq, "^21"),
+        BreactFrontendCategorizationFilter(breact_categorizer),
         PurchaseEmissionsEstimatorFilter(basic_purchase_estimator),
         
         DistanceEstimationFilter(open_route_distance_estimator),
@@ -96,17 +98,12 @@ def main():
 
         # show returned categories and emissions factors
         print("Product:", product.description)
-        print("Generated categories to match with emission factor (Climatiq):", product.climatiq_categories)
-        print("Matched category with emission factor (Climatiq):", product.climatiq_matched_category if product.climatiq_matched_category else "None") #this should be sorted now
+        print("Generated categories to match with emission factor (Climatiq):", product.estimated_categories)
+        print("Matched category with emission factor (Climatiq):", product.estimated_matched_category if product.estimated_matched_category else "None") #this should be sorted now
         print("Emission factor:", product.emission_factor.name if product.emission_factor else "None")
-
-        #a small try out for the breact categorizer
-        breact_categories = breact_categorizer.generate_categorization(product.description)
-        print(f"[Breact] Categorization for '{product.description}': {breact_categories[0]}")
-        breact_confidence = breact_categorizer.get_confidence_for_class(product.description, breact_categories[0])
-        print(f"[Breact] Confidence for '{breact_categories[0]}': {breact_confidence}")
-
+        print("FE Category:", product.category)
         print("Purchase emissions:", product.co2_purchase)
+
         # show cleaned supplier addresses and get distance calculation
         print(product.supplier_address)
         print(f"Distance: {product.delivery_distance}km")

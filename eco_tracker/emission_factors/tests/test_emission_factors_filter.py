@@ -34,8 +34,8 @@ def product():
         "test",
         "test"
       ),
-      climatiq_categories=["test"],
-      climatiq_matched_category=None,
+      estimated_categories=["test"],
+      estimated_matched_category=None,
       category="test",
       emission_factor=None,
       delivery_emission_factor=None,
