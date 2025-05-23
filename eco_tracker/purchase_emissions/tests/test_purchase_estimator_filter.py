@@ -27,8 +27,8 @@ def product():
         "test",
         "test"
       ),
-      climatiq_categories=["test"],
-      climatiq_matched_category=None,
+      estimated_categories=["test"],
+      estimated_matched_category=None,
       category="test",
       emission_factor=EmissionFactor(co2e=1, co2e_unit="kg", activity_unit="l", name="test", description="test"),
       delivery_emission_factor=None,

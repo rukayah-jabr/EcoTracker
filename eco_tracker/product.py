@@ -43,8 +43,8 @@ class Product:
 	supplier_address: Address
 	delivery_address: Address
 	# Data created by the pipeline
-	climatiq_categories: list[str] # TODO: change name to 'estimate_categories'
-	climatiq_matched_category: str | None # TODO: change name to 'estimate_matched_category'
+	estimated_categories: list[str]
+	estimated_matched_category: str | None
 	category: str | None # TODO: Change to an enum
 	emission_factor: EmissionFactor | None
 	delivery_emission_factor: EmissionFactor | None
