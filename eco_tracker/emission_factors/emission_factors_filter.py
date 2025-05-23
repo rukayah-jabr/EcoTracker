@@ -1,3 +1,4 @@
+from eco_tracker.categorization.breact.breact_categorization import BreactCategorizer
 from eco_tracker.emission_factors.emission_factors_interface import EmissionFactorsFetcher
 from eco_tracker.emission_factors.exceptions import EmissionFactorNotFound, EmissionFactorNotFoundForProduct
 from eco_tracker.pipeline import NextStep, PipelineStep

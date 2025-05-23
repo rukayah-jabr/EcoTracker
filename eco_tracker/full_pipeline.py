@@ -58,6 +58,7 @@ class FullPipeline:
             CategoryReorderFilter(breact_categorizer),
             EmissionFactorsFilter(climatiq, "^21"),
             BreactFrontendCategorizationFilter(breact_categorizer),
+
             PurchaseEmissionsEstimatorFilter(basic_purchase_estimator),
             
             DistanceEstimationFilter(open_route_distance_estimator),
