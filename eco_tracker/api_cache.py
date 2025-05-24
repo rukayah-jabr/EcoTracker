@@ -6,6 +6,9 @@ import threading
 from collections.abc import Callable
 from contextlib import contextmanager
 from datetime import datetime, timedelta
+from utils.log import get_logger
+
+logger = get_logger("api_cache")
 
 # Thread-local storage for database connections
 _local = threading.local()
@@ -85,9 +88,10 @@ def cached_api_call(url:str, request: str) -> dict | None:
 
 # Temporary helper function while developing to check full cache
 # def get_all_from_cache() -> list:
-#      cursor.execute("SELECT key, response, timestamp FROM api_cache")
-#      data = cursor.fetchall()
-#      return data
+#      with get_db_cursor() as cursor:
+#         cursor.execute("SELECT key, response, timestamp FROM api_cache")
+#         data = cursor.fetchall()
+#         return data
 
 def execute_or_get_from_cache(url: str, request: str) -> Callable:
     def decorator(function: Callable):
@@ -95,12 +99,13 @@ def execute_or_get_from_cache(url: str, request: str) -> Callable:
             # Check for cached API response first; if none, make fresh API call
             cache = cached_api_call(url, request)
             if cache == None:
+                logger.info(f"No cached response. Making fresh call to {url}")
                 response = function(*args, **kwargs)
                 save_to_cache(url, request, json.dumps(response))
                 return response
             else:
+                logger.info(f"Cached response found ({url})")
                 return cache
         
         return wrapper
     return decorator
-    
