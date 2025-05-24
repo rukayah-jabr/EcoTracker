@@ -1,7 +1,9 @@
 import openrouteservice
+import json
 
 from eco_tracker.distance_estimation import exceptions
 from eco_tracker.distance_estimation.distance_estimation_interface import DistanceEstimator
+from eco_tracker import api_cache
 
 
 class OpenRouteService(DistanceEstimator):
@@ -17,17 +19,22 @@ class OpenRouteService(DistanceEstimator):
         :param end: Tuple (longitude, latitude) for the destination point
         :return: Distance in kilometers
         """
-        try:
-            route = self.client.directions( # type: ignore
-                coordinates=[start, end],
-                profile='driving-car',  # Alternatives: 'cycling-regular', 'foot-walking', etc.
-                format='geojson'
-            )
-            distance_meters = route['features'][0]['properties']['segments'][0]['distance']
-            return distance_meters / 1000  # Convert meters to kilometers
-        except Exception:
-            raise exceptions.RouteDistanceFailed(start, end)
-    
+
+        @api_cache.execute_or_get_from_cache(url="open_route_service.directions", request=json.dumps({"start":start, "end":end}))
+        def fetch_distance(coordinates: list) -> float:
+            try:
+                route = self.client.directions( # type: ignore
+                    coordinates=coordinates,
+                    profile='driving-car',  # Alternatives: 'cycling-regular', 'foot-walking', etc.
+                    format='geojson'
+                )
+                distance_meters = route['features'][0]['properties']['segments'][0]['distance']
+                return distance_meters / 1000  # Convert meters to kilometers
+            except Exception:
+                raise exceptions.RouteDistanceFailed(start, end)
+        
+        return fetch_distance([start, end])
+
     def get_location_coordinates(self, address: str) -> tuple[float, float]:
         """
         Returns the coordinates of a given address
@@ -35,16 +42,20 @@ class OpenRouteService(DistanceEstimator):
         :param address: String for the address
         :return: List of coordinates, latitude and longitude
         """
-        try:
-            geocode = self.client.pelias_search(text=address) # type: ignore
+        @api_cache.execute_or_get_from_cache(url="open_route_service.pelias_search", request=address)
+        def fetch_coords(address: str) -> tuple[float, float]:
+            try:
+                geocode = self.client.pelias_search(text=address) # type: ignore
 
-            if len(geocode['features']) < 3: # only calculate accurate address with 1-2 addresses
-                coords = geocode['features'][0]['geometry']['coordinates']
-                return coords
-            else:
+                if len(geocode['features']) < 3: # only calculate accurate address with 1-2 addresses
+                    coords = geocode['features'][0]['geometry']['coordinates']
+                    return coords
+                else:
+                    raise exceptions.CoordinatesNotFound(address)
+            except Exception:
                 raise exceptions.CoordinatesNotFound(address)
-        except Exception:
-            raise exceptions.CoordinatesNotFound(address)
+        
+        return fetch_coords(address)
     
     def get_distance_from_delivery_address(self, supplier_address: str, delivery_address: str) -> float:
         """

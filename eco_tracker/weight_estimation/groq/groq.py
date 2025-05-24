@@ -8,6 +8,7 @@ from pydantic import BaseModel
 
 from eco_tracker.weight_estimation.exceptions import WeightEstimationFailed
 from eco_tracker.weight_estimation.weight_estimation_interface import WeightEstimator
+from eco_tracker import api_cache
 
 
 @dataclass
@@ -40,14 +41,18 @@ class GroqWeightEstimator(WeightEstimator):
       ]
     }
 
-    response = requests.post(url, json=body, headers=self.authorization_headers)
-    if response.status_code != HTTPStatus.OK:
-      raise WeightEstimationFailed(product_description)
+    @api_cache.execute_or_get_from_cache(url=url, request=json.dumps(body))
+    def fetch_weight(body: dict) -> float:
+      response = requests.post(url, json=body, headers=self.authorization_headers)
+      if response.status_code != HTTPStatus.OK:
+        raise WeightEstimationFailed(product_description)
 
-    body = response.json()
-    response_message = body['choices'][0]['message']['content']
-    weight = json.loads(response_message)["weight"]
-    return weight
+      body = response.json()
+      response_message = body['choices'][0]['message']['content']
+      weight = json.loads(response_message)["weight"]
+      return weight
+    
+    return fetch_weight(body)
 
   def estimate_weight_of_quantity(self, product_description: str, quantity: float) -> float:
     return self.estimate_weight(product_description) * quantity
