@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <h3 class="border-t pt-5">Temporary test of API fetch and and data return</h3>
+    <h3 class="border-t pt-5">Temporary test of API fetch and data return</h3>
     <ul class="ml-5 my-3">
       <li><b>2024-08-02</b> to <b>2024-08-02:</b> 2 entries</li>
       <li><b>2024-08-02</b> to <b>2024-08-05:</b> 8 entires</li>
