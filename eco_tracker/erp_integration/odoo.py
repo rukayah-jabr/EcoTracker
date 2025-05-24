@@ -172,8 +172,8 @@ class Odoo(DataFetcher):
                         zip = "3300",
                         country = "AT"
                     ),
-                    climatiq_categories = [],
-                    climatiq_matched_category = None,
+                    estimated_categories= [],
+                    estimated_matched_category= None,
                     category = None,
                     emission_factor = None,
                     delivery_emission_factor = None,

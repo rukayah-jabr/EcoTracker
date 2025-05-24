@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from eco_tracker.categorization.breact.breact_categorization import BreactCategorizer
-from eco_tracker.categorization.breact.breact_reorder_categorization import CategoryReorderStep
+from eco_tracker.categorization.breact.breact_reorder_categorization_filter import CategoryReorderFilter
 from eco_tracker.product import Address, FailedSteps, Product
 
 
@@ -32,8 +32,8 @@ def test_category_reorder_step_reorders_by_confidence(mock_breact_categorizer):
         delivery_address=Address("Test Street", "Test City", "12345", "Test Country"),
         delivery_transportation_type=None,
         delivery_emission_factor=None,
-        climatiq_categories=["Beleuchtung", "Elektronik", "Haushaltsgeraete", "Service"],
-        climatiq_matched_category="",
+        estimated_categories=["Beleuchtung", "Elektronik", "Haushaltsgeraete", "Service"],
+        estimated_matched_category="",
         category="",
         emission_factor=None,
         delivery_distance=0.0,
@@ -51,12 +51,12 @@ def test_category_reorder_step_reorders_by_confidence(mock_breact_categorizer):
     )
 
     next_step = MagicMock()  # fake a call to check later
-    reorder_step = CategoryReorderStep(mock_breact_categorizer)
+    reorder_step = CategoryReorderFilter(mock_breact_categorizer)
 
     reorder_step(product, next_step)
 
     # Check if categories were sorted by confidence and categories below the threshold were discarded (Elektronik > Haushaltsgeraete), Beleuchtung and Service should be ignored
-    assert product.climatiq_categories == ["Elektronik", "Haushaltsgeraete"]
+    assert product.estimated_categories == ["Elektronik", "Haushaltsgeraete"]
 
     # check if pipeline continues
     next_step.assert_called_once_with(product)

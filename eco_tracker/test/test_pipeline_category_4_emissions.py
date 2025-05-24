@@ -2,7 +2,7 @@ import os
 from datetime import date
 
 import pytest
-from delivery_emissions.delivery_emissions_estimator_filter import DeliveryEmissionsEstimatorFilter
+from eco_tracker.delivery_emissions.delivery_emissions_estimator_filter import DeliveryEmissionsEstimatorFilter
 from dotenv import load_dotenv
 
 from eco_tracker.delivery_emissions.distance_based_method.distance_based_method import DistanceBasedMethod
@@ -64,8 +64,8 @@ def product():
 		unit="number",
 		unit_price=1000.00,
 		quantity=2,
-		climatiq_categories=[],
-		climatiq_matched_category=None,
+		estimated_categories=[],
+		estimated_matched_category=None,
 		category="category",
 		supplier="supplier",
 		supplier_address= Address(
