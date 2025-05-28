@@ -28,7 +28,7 @@ const store = useDashboardStore()
 
 async function fetchData() {
     if (props.api) {
-        store.api_endpoint = props.api
+        store.apiEndpoint = props.api // set endpoint as text field value
         store.loadData()
     }
 }

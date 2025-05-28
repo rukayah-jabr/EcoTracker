@@ -20,7 +20,6 @@
 import { useDashboardStore } from '@/stores/useDashboardStore'
 
 const store = useDashboardStore()
-// const apiEndpoint = ref(store.apiEndpoint)
 
 function onDateChange(newRange) {
   store.updateFilter('dateRange', newRange)

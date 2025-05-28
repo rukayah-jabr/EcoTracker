@@ -6,8 +6,8 @@
   </div>
 </template>
 
-<script setup>
-import { useDashboardStore } from '@/stores/useDashboardStore'
+<script lang="ts" setup>
+import { useDashboardStore } from '../stores/useDashboardStore'
 import { onMounted } from 'vue'
 
 const store = useDashboardStore()

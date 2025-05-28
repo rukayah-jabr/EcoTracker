@@ -5,7 +5,7 @@ import type { EmissionsDataRecord } from '../types/emissionsDataRecord'
 import { formatDateToYMD } from '@/utils/dateHelpers'
 
 export const useDashboardStore = defineStore('dashboard', () => {
-  const api_endpoint = ref('')
+  const apiEndpoint = ref('http://localhost:8069')
   const rawData = ref<EmissionsDataRecord[]>([])
   const filters = ref({
     dateRange: [ new Date(2024, 7, 2), new Date(2024, 7, 2) ], // month index is 1 off from actual month
@@ -17,11 +17,10 @@ export const useDashboardStore = defineStore('dashboard', () => {
 
   async function loadData() {
     isLoading.value = true
-    if (!api_endpoint) {
+    if (!apiEndpoint) {
       error.value = "No API endpoint set"
       return
     }
-    console.log("API: " + api_endpoint.value)
 
     let start = formatDateToYMD(filters.value.dateRange[0])
     let end = formatDateToYMD(filters.value.dateRange[filters.value.dateRange.length - 1]) // uses last value in dynamic range
@@ -30,8 +29,15 @@ export const useDashboardStore = defineStore('dashboard', () => {
 
     try {
       // http://localhost:8069
-      const fetchUrl = api_endpoint.value + "&start_date=" + start + "&end_date=" + end
+      const fetchUrl = apiEndpoint.value + "&start_date=" + start + "&end_date=" + end
       rawData.value = await fetchEmissionsData(fetchUrl)
+      
+      // Add computed fields
+      rawData.value = rawData.value.map(item => ({
+        ...item,
+        co2_total: item.co2_purchase + item.co2_transport
+      }));
+
       console.log(rawData.value)
     }
     catch(err: any) {
@@ -58,5 +64,5 @@ export const useDashboardStore = defineStore('dashboard', () => {
     })
   })
 
-  return { api_endpoint, rawData, filteredData, filters, loadData, updateFilter, isLoading, loaded, error }
+  return { apiEndpoint, rawData, filteredData, filters, loadData, updateFilter, isLoading, loaded, error }
 })
