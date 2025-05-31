@@ -27,7 +27,7 @@ Please clone the repo and run the app.py to proceed.
 ### ✅ Prerequisites
 
 - Python 3.13
-    
+- Node.js    
 - API Keys:
     
     - [Climatiq](https://www.climatiq.io/) – for emission factors
