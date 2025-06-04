@@ -6,7 +6,7 @@
       <div v-if="store.error" class="error">
         {{ store.error }}
       </div>
-      <v-alert v-if="store.loaded & !store.error"
+      <v-alert v-if="store.loaded && !store.error"
         color="success"
         icon="$success"
         title="Data successfully imported"

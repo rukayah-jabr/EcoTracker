@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { fetchEmissionsData } from '@/services/dataService'
 import type { EmissionsDataRecord } from '../types/emissionsDataRecord'
-import { formatDateToYMD } from '@/utils/dateHelpers'
+import { formatDateToYMD } from '../utils/dateHelpers'
 
 export const useDashboardStore = defineStore('dashboard', () => {
   const apiEndpoint = ref('http://localhost:8069')
@@ -11,6 +11,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
     dateRange: [ new Date(2024, 7, 2), new Date(2024, 7, 2) ], // month index is 1 off from actual month
     category: null,
   })
+  const filteredData = ref<EmissionsDataRecord[]>([])
   const isLoading = ref(false)
   const loaded = ref(false)
   const error = ref('')
@@ -22,8 +23,8 @@ export const useDashboardStore = defineStore('dashboard', () => {
       return
     }
 
-    let start = formatDateToYMD(filters.value.dateRange[0])
-    let end = formatDateToYMD(filters.value.dateRange[filters.value.dateRange.length - 1]) // uses last value in dynamic range
+    let start = filters.value.dateRange[0]
+    let end = filters.value.dateRange[1] // uses last value in dynamic range
     
     console.log("Setting date range: " + start + " to " + end)
 
@@ -35,10 +36,12 @@ export const useDashboardStore = defineStore('dashboard', () => {
       // Add computed fields
       rawData.value = rawData.value.map(item => ({
         ...item,
-        co2_total: item.co2_purchase + item.co2_transport
+        co2_total: item.co2_purchase + item.co2_transport,
+        date: new Date(item.delivered_date)
       }));
 
       console.log(rawData.value)
+      filterData()
     }
     catch(err: any) {
       error.value = err.message || 'Failed to fetch data'
@@ -53,16 +56,19 @@ export const useDashboardStore = defineStore('dashboard', () => {
     filters.value[key] = value
   }
 
-  const filteredData = computed(() => {
-    return rawData.value.filter(item => {
-      const withinDate =
-        (!filters.value.dateRange[0] || new Date(item.delivered_date) >= new Date(filters.value.dateRange[0])) &&
-        (!filters.value.dateRange[1] || new Date(item.delivered_date) <= new Date(filters.value.dateRange[1]))
-      const matchesCategory =
-        !filters.value.category || item.category === filters.value.category
-      return withinDate && matchesCategory
+  function filterData() {
+    filteredData.value = computed(() => {
+      return rawData.value.filter(item => {
+        const withinDate =
+          (!filters.value.dateRange[0] || new Date(item.delivered_date) >= new Date(filters.value.dateRange[0])) &&
+          (!filters.value.dateRange[1] || new Date(item.delivered_date) <= new Date(filters.value.dateRange[1]))
+        const matchesCategory =
+          !filters.value.category || item.category === filters.value.category
+        return withinDate && matchesCategory
+      })
     })
-  })
+  }
 
-  return { apiEndpoint, rawData, filteredData, filters, loadData, updateFilter, isLoading, loaded, error }
+
+  return { apiEndpoint, rawData, filteredData, filters, loadData, updateFilter, filterData, isLoading, loaded, error }
 })

@@ -5,3 +5,11 @@ export function formatDateToYMD(date: Date): string {
   const day = String(date.getDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
 }
+
+// TODO: make this work
+export function formatYMDToDate(date: String): Date {
+  const year = date.split("-")[0]
+  const month = date.split("-")[1]
+  const day = date.split("-")[2]
+  return new Date(year, month, day)
+}
