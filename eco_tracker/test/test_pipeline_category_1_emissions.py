@@ -37,7 +37,7 @@ def categorizer():
 	return ClimatiqCategorizer(llm_api_key)
 
 @pytest.fixture
-def breact_categorizer():
+def breact_categorizer_mock():
     mock = MagicMock()
     mock.get_confidence_for_class.return_value = 1.0
     return mock
@@ -55,24 +55,24 @@ def purchase_emissions_estimator():
 	return BasicPurchaseEmissionsEstimator()
 
 @pytest.fixture
-def emission_factors_filter(climatiq, breact_categorizer) -> EmissionFactorsFilter:
-	return EmissionFactorsFilter(climatiq, "^21", breact_categorizer)
+def emission_factors_filter(climatiq, breact_categorizer_mock) -> EmissionFactorsFilter:
+	return EmissionFactorsFilter(climatiq, "^21", breact_categorizer_mock)
 
 @pytest.fixture
 def climatiq_categorizer_filter(categorizer) -> ClimatiqCategorizerFilter:
 	return ClimatiqCategorizerFilter(categorizer)
 
 @pytest.fixture
-def category_reorder_step(breact_categorizer) -> CategoryReorderFilter:
-	return CategoryReorderFilter(breact_categorizer)
+def category_reorder_step(breact_categorizer_mock) -> CategoryReorderFilter:
+	return CategoryReorderFilter(breact_categorizer_mock)
 
 @pytest.fixture
 def purchase_emissions_estimator_filter(purchase_emissions_estimator) -> PurchaseEmissionsEstimatorFilter:
 	return PurchaseEmissionsEstimatorFilter(purchase_emissions_estimator)
 
 @pytest.fixture
-def breact_fe_categorization_filter(breact_categorizer) -> BreactFrontendCategorizationFilter:
-	return BreactFrontendCategorizationFilter(breact_categorizer)
+def breact_fe_categorization_filter(breact_categorizer_mock) -> BreactFrontendCategorizationFilter:
+	return BreactFrontendCategorizationFilter(breact_categorizer_mock)
 
 @pytest.fixture
 def distance_estimation_filter(open_route_service) -> DistanceEstimationFilter:

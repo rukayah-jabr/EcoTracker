@@ -26,7 +26,7 @@ class EmissionFactorsFilter(PipelineStep):
                     category, product.unit, self.data_version
                 )
 
-                confidence = self.categorizer.get_confidence_for_class(product.description, emission_factor.description)
+                confidence = self.categorizer.get_confidence_for_class(emission_factor.description, product.description)
                 if confidence < 0.7:
                     continue  # Skip low-confidence match
 
