@@ -9,7 +9,15 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AppFooter: typeof import('./components/AppFooter.vue')['default']
+    BarChart: typeof import('./components/BarChart.vue')['default']
     CalculateEmissionsTemp: typeof import('./components/CalculateEmissionsTemp.vue')['default']
+    CategoryFilter: typeof import('./components/CategoryFilter.vue')['default']
+    DataFilterGroup: typeof import('./components/DataFilterGroup.vue')['default']
+    DataFilters: typeof import('./components/DataFilters.vue')['default']
+    DateFilter: typeof import('./components/DateFilter.vue')['default']
+    EmissionsOverTime: typeof import('./components/EmissionsOverTime.vue')['default']
+    FetchDataButton: typeof import('./components/FetchDataButton.vue')['default']
+    FilterDataButton: typeof import('./components/FilterDataButton.vue')['default']
     HelloWorld: typeof import('./components/WelcomeText.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
