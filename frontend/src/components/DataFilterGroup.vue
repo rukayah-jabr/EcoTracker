@@ -1,6 +1,12 @@
 <template>
-    <DateFilter :defaultRange=defaultRange></DateFilter>
-    <!-- <CategoryFilter></CategoryFilter> -->
+    <v-row class="my-5">
+        <v-col cols="4">
+            <DateFilter :defaultRange=defaultRange></DateFilter>
+        </v-col>
+        <v-col>
+            <CategoryFilter></CategoryFilter>
+        </v-col>
+    </v-row>
 </template>
 
 <script lang="ts" setup>

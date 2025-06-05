@@ -9,7 +9,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
   const rawData = ref<EmissionsDataRecord[]>([])
   const filters = ref({
     dateRange: [ new Date(2024, 7, 2), new Date(2024, 7, 2) ], // month index is 1 off from actual month
-    category: null,
+    category: [],
   })
   const filteredData = ref<EmissionsDataRecord[]>([])
   const isLoading = ref(false)
@@ -63,7 +63,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
           (!filters.value.dateRange[0] || new Date(item.delivered_date) >= new Date(filters.value.dateRange[0])) &&
           (!filters.value.dateRange[1] || new Date(item.delivered_date) <= new Date(filters.value.dateRange[1]))
         const matchesCategory =
-          !filters.value.category || item.category === filters.value.category
+          filters.value.category.length == 0 || filters.value.category.includes(item.category)
         return withinDate && matchesCategory
       })
     })

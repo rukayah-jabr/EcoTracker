@@ -3,11 +3,11 @@
     <v-select
     clearable
     chips
-    label="Select"
+    label="Select category"
     :items="displayCategories"
-    :v-model="selectedCategories"
+    v-model="store.filters.category"
     multiple
-    :oninput="onCategoryChange(selectedCategories)"
+    @update:modelValue="onCategoryChange(store.filters.category)"
     ></v-select>
   </div>
 </template>

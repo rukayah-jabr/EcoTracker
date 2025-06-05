@@ -1,12 +1,13 @@
 <template>
     <div class="my-3">
       <v-btn color="primary" @click="fetchData" :loading="store.isLoading">
-        Import Data
+        <span v-if=store.loaded>Reimport Data</span>
+        <span v-else>Import Data</span>
       </v-btn>
       <div v-if="store.error" class="error">
         {{ store.error }}
       </div>
-      <v-alert v-if="store.loaded && !store.error"
+      <v-alert v-if="store.loaded && !store.error && !store.isLoading"
         color="success"
         icon="$success"
         title="Data successfully imported"
