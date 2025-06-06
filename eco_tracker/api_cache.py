@@ -6,7 +6,7 @@ import threading
 from collections.abc import Callable
 from contextlib import contextmanager
 from datetime import datetime, timedelta
-from utils.log import get_logger
+from eco_tracker.utils.log import get_logger
 
 logger = get_logger("api_cache")
 

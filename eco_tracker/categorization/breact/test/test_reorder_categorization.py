@@ -11,12 +11,20 @@ from eco_tracker.product import Address, FailedSteps, Product
 @pytest.fixture
 def mock_breact_categorizer():
     mock = MagicMock(spec=BreactCategorizer)
-    # Simulated confidence values per category
-    mock.get_confidence_for_class.side_effect = lambda desc, cat: {
-        "Elektronik": 0.9,
-        "Beleuchtung": 0.6,
-        "Haushaltsgeraete": 0.8
-    }.get(cat, 0.0)
+
+    def generate_confidences(description, allowed_classes=None):
+        # Simulate filtering based on allowed_classes
+        all_confidences = {
+            "Elektronik": 0.9,
+            "Beleuchtung": 0.6,
+            "Haushaltsgeraete": 0.8,
+            "Service": 0.3,
+        }
+        if allowed_classes is None:
+            return all_confidences
+        return {k: v for k, v in all_confidences.items() if k in allowed_classes}
+
+    mock.generate_confidences.side_effect = generate_confidences
     return mock
 
 
@@ -55,8 +63,15 @@ def test_category_reorder_step_reorders_by_confidence(mock_breact_categorizer):
 
     reorder_step(product, next_step)
 
-    # Check if categories were sorted by confidence and categories below the threshold were discarded (Elektronik > Haushaltsgeraete), Beleuchtung and Service should be ignored
+    # Check if categories were filtered by confidence threshold (>=0.7) and sorted descending
+    # "Beleuchtung" and "Service" should be excluded due to confidence < 0.7
     assert product.estimated_categories == ["Elektronik", "Haushaltsgeraete"]
 
     # check if pipeline continues
     next_step.assert_called_once_with(product)
+
+    # check that the new generate_confidences was called and not the old get_confidence_for_class
+    mock_breact_categorizer.generate_confidences.assert_called_once_with(
+        product.description,
+        ["Beleuchtung", "Elektronik", "Haushaltsgeraete", "Service"]
+    )
