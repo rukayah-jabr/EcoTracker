@@ -21,6 +21,15 @@ class Address:
 	def __str__(self):
 		return f"{self.street}, {self.zip} {self.city}, {self.country}"
 
+# Lieferung
+@dataclass
+class Delivery:
+	def __init__(self, id: int, name: str, type: str, partner_name: str):
+		self.id = id
+		self.name = name
+		self.type = type
+		self.partner_name = partner_name
+
 @dataclass
 class EmissionFactor:
 	co2e: float
@@ -42,6 +51,7 @@ class Product:
 	supplier: str
 	supplier_address: Address
 	delivery_address: Address
+	delivery: Delivery | None
 	# Data created by the pipeline
 	estimated_categories: list[str]
 	estimated_matched_category: str | None

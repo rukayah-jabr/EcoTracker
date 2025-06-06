@@ -41,6 +41,10 @@ def test_odoo_get_supplier_address(odoo_authenticated_instance):
 def test_odoo_standardize_unit(odoo_instance):
     assert odoo_instance.standardize_unit("STK") == 'number'
 
+def test_odoo_get_delivery(odoo_authenticated_instance):
+    delivery = odoo_authenticated_instance.get_delivery(1)
+    assert delivery is not None
+
 def test_odoo_fetch_data_from_source(odoo_instance):
     data = odoo_instance.fetch_data_from_source()
     assert data is not None

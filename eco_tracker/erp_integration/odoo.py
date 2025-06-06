@@ -8,8 +8,11 @@ from dotenv import load_dotenv
 from eco_tracker import product
 from eco_tracker.erp_integration import exceptions
 from eco_tracker.erp_integration.fetch_data_interface import Data, DataFetcher
+from eco_tracker.utils.log import get_logger
 
 load_dotenv()
+
+logger = get_logger(__name__)
 
 class Odoo(DataFetcher):
     def __init__(self, api_base_url: str):
@@ -56,7 +59,7 @@ class Odoo(DataFetcher):
                 "method": "search_read",
                 "args": [[]],
                 "kwargs": {
-                    "fields": ["date", "partner_id", "name", "product_uom", "product_uom_qty", "price_unit"],
+                    "fields": ["date", "partner_id", "name", "product_uom", "product_uom_qty", "price_unit", "picking_id"],
                 },
                 "context": {
                     "session_id": self.session_id
@@ -132,6 +135,37 @@ class Odoo(DataFetcher):
 
         raise NotImplementedError
 
+    def get_delivery(self, delivery_id: int) -> product.Delivery:
+        url = self.api_base_url + "/web/dataset/call_kw/stock.picking/search_read"
+        data = {
+            "jsonrpc": "2.0",
+            "params": {
+                "model": "stock.move",
+                "method": "search_read",
+                "args": [[["id", "=", delivery_id]]],
+                "kwargs": {
+                    "fields": ["id", "name", "type", "partner_name"],
+                },
+                "context": {
+                    "session_id": self.session_id
+                }
+            }
+        }
+        response = requests.post(url=url, headers=self.headers, json=data)
+        if not response.ok:
+            raise exceptions.FetchingDataFailed(url=url)
+        
+        result = response.json()
+        if len(result['result']) == 0:
+            raise exceptions.DeliveryNotFound(delivery_id)
+        
+        return product.Delivery(
+            id = result['result'][0]['id'],
+            name = result['result'][0]['name'],
+            type = result['result'][0]['type'],
+            partner_name = result['result'][0]['partner_name']
+        )
+
     # Implemented function used in FetchDataFilter
     def fetch_data_from_source(self, start_date: datetime | None = None, end_date: datetime | None = None) -> Data:
         self.authenticate()
@@ -146,7 +180,7 @@ class Odoo(DataFetcher):
         for item in results:
 
             # Clean address
-            address = self.get_supplier_address(item['id'])
+            address = self.get_supplier_address(item['partner_id'][0])
             address = address[0]
             standardized_address = product.Address(
                 street = re.split(r'\s{2,}', address['street'])[1], # remove the company name from street address by splitting on 2+ spaces
@@ -154,6 +188,12 @@ class Odoo(DataFetcher):
                 zip = address['zip'],
                 country = address['country_id']
             )
+
+            delivery = None
+            try:
+                delivery = self.get_delivery(item['picking_id'][0])
+            except exceptions.DeliveryNotFound:
+                logger.warning(f"Delivery not found for item {item['id']}")
 
             # Standarized unit
             unit = self.standardize_unit(item['product_uom'])
@@ -172,6 +212,7 @@ class Odoo(DataFetcher):
                         zip = "3300",
                         country = "AT"
                     ),
+                    delivery = delivery,
                     estimated_categories= [],
                     estimated_matched_category= None,
                     category = None,

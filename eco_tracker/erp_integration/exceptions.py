@@ -21,3 +21,11 @@ class SupplierNotFound(Exception):
 
 		def __str__(self):
 				return f"Supplier address not found for supplier ID {self.supplier_id}"
+  
+class DeliveryNotFound(Exception):
+		def __init__(self, delivery_id):
+				self.delivery_id = delivery_id
+				super().__init__(f"Delivery not found for delivery ID {delivery_id}")
+
+		def __str__(self):
+				return f"Delivery not found for delivery ID {self.delivery_id}"

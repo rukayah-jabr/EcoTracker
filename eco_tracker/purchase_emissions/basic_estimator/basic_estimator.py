@@ -9,12 +9,24 @@ class BasicPurchaseEmissionsEstimator(PurchaseEmissionsEstimator):
     if product.emission_factor is None:
       raise PurchaseEmissionFactorNotSet(product.description)
     
+    co2_purchase = 0.0
     match product.emission_factor.activity_unit:
       case '':
-        return product.emission_factor.co2e * product.quantity
+        co2_purchase = product.emission_factor.co2e * abs(product.quantity)
       case 'l':
-        return product.emission_factor.co2e * product.quantity
+        co2_purchase = product.emission_factor.co2e * abs(product.quantity)
       case 'eur':
-        return product.emission_factor.co2e * product.quantity * product.unit_price
+        co2_purchase = product.emission_factor.co2e * abs(product.quantity) * abs(product.unit_price)
+      case _:
+        raise NotSupportedMeasurementUnit(product.emission_factor.activity_unit)
     
-    raise NotSupportedMeasurementUnit(product.emission_factor.activity_unit)
+    if self.check_if_delivery_is_return(product):
+      co2_purchase = -co2_purchase
+    
+    return co2_purchase
+  
+  
+  def check_if_delivery_is_return(self, product: Product) -> bool:
+    if not hasattr(product, 'delivery') or product.delivery is None:
+      return False
+    return product.delivery.type == 'R'
