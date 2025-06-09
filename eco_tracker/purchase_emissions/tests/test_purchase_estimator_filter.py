@@ -46,7 +46,8 @@ def product():
         distance_estimation=False,
         weight_estimation=False,
         delivery_emissions_estimation=False
-      )
+      ),
+      confidence=0.7
     )
 
 def test_purchase_estimator_filter_emission_factor_fetching_failed(product):

@@ -38,9 +38,14 @@ def categorizer():
 
 @pytest.fixture
 def breact_categorizer_mock():
-    mock = MagicMock()
-    mock.get_confidence_for_class.return_value = 1.0
-    return mock
+	mock = MagicMock()
+	mock.get_confidence_for_class.return_value = 1.0
+	mock.generate_confidences.return_value = {
+			"laptop": 0.95,
+			"notebook": 0.9,
+			"computer": 0.85
+		}
+	return mock
 
 @pytest.fixture
 def open_route_service():
@@ -118,7 +123,8 @@ def product():
 			distance_estimation=False,
 			weight_estimation=False,
 			delivery_emissions_estimation=False
-		)
+		),
+		confidence=0.7
 	)
 
 def test_estimate_category_1_emissions(emission_factors_filter, category_reorder_step, climatiq_categorizer_filter, purchase_emissions_estimator_filter, breact_fe_categorization_filter, product):

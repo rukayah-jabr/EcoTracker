@@ -54,7 +54,8 @@ def product():
         distance_estimation=False,
         weight_estimation=False,
         delivery_emissions_estimation=False
-      )
+      ),
+      confidence=0.7
     )
 
 @pytest.fixture

@@ -96,6 +96,7 @@ def product():
 			weight_estimation=False,
 			delivery_emissions_estimation=False
 		),
+		confidence=0.7
 	)
  
 def test_estimate_category_4_emissions(distance_estimation_filter, emission_factors_transportation_filter, weight_estimation_filter, delivery_emissions_estimator_filter, product):

@@ -42,7 +42,8 @@ def create_test_product() -> Product:
             distance_estimation=False,
             weight_estimation=False,
             delivery_emissions_estimation=False
-        )
+        ),
+        confidence=0.7
     )
 
 def test_breact_fe_categorization_assigns_category():
