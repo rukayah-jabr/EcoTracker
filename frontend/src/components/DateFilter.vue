@@ -3,9 +3,7 @@
     <v-date-input
       v-model="dateRange"
       label="Select date range"
-      max-width="368"
       multiple="range"
-      class="mr-5"
       :oninput="onDateChange(dateRange)"
     ></v-date-input>
   </div>

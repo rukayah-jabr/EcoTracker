@@ -38,6 +38,7 @@ def calculate_emissions(
     url: Annotated[str, Query(description="The URL of the Odoo instance.")],
     start_date: Annotated[str | None, Query(description="The start date in ISO format.")] = None,
     end_date: Annotated[str | None, Query(description="The end date in ISO format.")] = None,
+    confidence: Annotated[float | None, Query(description="The confidence threshold for selecting emissions factors (0-1)")] = None
 ):
     start_date_parsed: datetime | None = None
     end_date_parsed: datetime | None = None
@@ -48,7 +49,7 @@ def calculate_emissions(
     if end_date is not None:
         end_date_parsed = datetime.fromisoformat(end_date)
         
-    enriched_products = pipeline_instance.calculate_emissions(url, start_date_parsed, end_date_parsed)
+    enriched_products = pipeline_instance.calculate_emissions(url, start_date_parsed, end_date_parsed, confidence)
     return enriched_products
 
 if __name__ == "__main__":

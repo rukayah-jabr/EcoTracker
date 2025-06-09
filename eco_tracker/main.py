@@ -93,6 +93,10 @@ def main():
         if index == 2: # limit for testing purposes
             break
 
+        # Set confidence for Climatiq emissions validation
+        product.confidence = 0.7
+        print(f"Using confidence: {product.confidence}")
+
         # Run pipeline
         pipeline(product)
 

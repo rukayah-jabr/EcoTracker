@@ -2,17 +2,25 @@
   <div>
     <h1 class="mb-5">Connect Your Data</h1>
     <v-row>
-      <v-col>
+      <v-col cols="4">
         <v-text-field
         label="API Endpoint"
         v-model="store.apiEndpoint"
         prepend-icon="mdi-link"></v-text-field>
       </v-col>
-      <v-col cols="6">
+      <v-col cols="3">
         <DateFilter :defaultRange="dateRange"></DateFilter>
       </v-col>
     </v-row>
+    <v-row>
+      <v-col cols="5">
+        <ConfidenceSlider></ConfidenceSlider>
+      </v-col>
+    </v-row>
     <fetch-data-button :api="store.apiEndpoint"></fetch-data-button>
+  </div>
+  <div>
+    <failed-steps-table></failed-steps-table>
   </div>
 </template>
 

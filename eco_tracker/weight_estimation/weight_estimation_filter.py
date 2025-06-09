@@ -11,6 +11,7 @@ class WeightEstimationFilter(PipelineStep):
     self.weight_estimator = weight_estimator
     
   def __call__(self, product: Product, next_step: NextStep) -> None:
+    print("----------------------------------------\nPIPELINE STEP: Estimate Weight")
     if product.failed_steps.distance_estimation:
       logger.error(f"Weight estimation not calculated because distance estimation failed for product {product.description}")
       product.failed_steps.weight_estimation = True

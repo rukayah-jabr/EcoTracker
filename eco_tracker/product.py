@@ -64,3 +64,4 @@ class Product:
 	co2_purchase: float | None
 	co2_transport: float | None
 	failed_steps: FailedSteps
+	confidence: float | None
