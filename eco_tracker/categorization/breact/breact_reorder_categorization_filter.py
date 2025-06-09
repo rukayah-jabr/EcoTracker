@@ -1,27 +1,39 @@
 from eco_tracker.categorization.breact.breact_categorization import BreactCategorizer
 from eco_tracker.pipeline import NextStep, PipelineStep
 from eco_tracker.product import Product
-
+from eco_tracker.categorization.groq.groq_categorizer import ClimatiqCategorizer
+from eco_tracker.api_cache import cached_api_call
+import os
+import json
 
 class CategoryReorderFilter(PipelineStep):
     def __init__(self, categorizer: BreactCategorizer):
         self.categorizer = categorizer
 
     def __call__(self, product: Product, next_step: NextStep) -> None:
+        print("----------------------------------------\nPIPELINE STEP: Reordering of Categorization")
         if product.failed_steps.estimate_categories or not product.estimated_categories: #in case there is no categories
             next_step(product)
             return
+        
+        # check if reordered categories already saved in cache; this means this step can be skipped
+        url = ClimatiqCategorizer(os.getenv("LLM_API_KEY")).get_url()
+        if cached_api_call(url=url, request=json.dumps({"product": product.description, "confidence": product.confidence})):
+            next_step(product)
+            return
 
-        confidences = {}
-        for category in product.estimated_categories:
-            try:
-                confidence = self.categorizer.get_confidence_for_class(product.description, category)
-                if confidence >= 0.7:  # confidence threshold = 0.7, anything lower is discarded
-                    confidences[category] = confidence
-            except Exception:
-                confidences[category] = 0.0
+        # all print statements are only for demo
+        confidences = self.categorizer.generate_confidences(product.description, product.estimated_categories)
+        # confidence threshold 0.7
+        filtered_confidences = {
+            cat: conf for cat, conf in confidences.items()
+            if cat in product.estimated_categories and conf >= 0.7
+        }
+        print("Original estimated categories:", product.estimated_categories)
+        print("Confidences from API:", confidences)
 
-        sorted_categories = sorted(confidences.items(), key=lambda x: x[1], reverse=True)
+        sorted_categories = sorted(filtered_confidences.items(), key=lambda x: x[1], reverse=True)
         product.estimated_categories = [cat for cat, _ in sorted_categories]
+        print ("this is after reorder:", product.estimated_categories)
 
         next_step(product)
