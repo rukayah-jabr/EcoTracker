@@ -2,9 +2,9 @@ import os
 from datetime import date
 
 import pytest
-from eco_tracker.delivery_emissions.delivery_emissions_estimator_filter import DeliveryEmissionsEstimatorFilter
 from dotenv import load_dotenv
 
+from eco_tracker.delivery_emissions.delivery_emissions_estimator_filter import DeliveryEmissionsEstimatorFilter
 from eco_tracker.delivery_emissions.distance_based_method.distance_based_method import DistanceBasedMethod
 from eco_tracker.distance_estimation.distance_estimation_filter import DistanceEstimationFilter
 from eco_tracker.distance_estimation.open_route_service.open_route_service import OpenRouteService
@@ -85,6 +85,7 @@ def product():
 		emission_factor=None,
 		delivery_emission_factor=None,
 		delivery_distance=0,
+		delivery=None,
 		co2_purchase=0,
 		co2_transport=0,
 		failed_steps=FailedSteps(
@@ -111,4 +112,3 @@ def test_estimate_category_4_emissions(distance_estimation_filter, emission_fact
 	assert product.delivery_emission_factor is not None
 	assert product.weight is not None
 	assert product.co2_transport != 0
-	# assert product.co2_transport is not None

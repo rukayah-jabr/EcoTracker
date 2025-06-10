@@ -53,4 +53,4 @@ def calculate_emissions(
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("api:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("eco_tracker.api:app", host="0.0.0.0", port=8000, reload=True)

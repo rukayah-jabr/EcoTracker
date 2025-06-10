@@ -40,6 +40,7 @@ def test_category_reorder_step_reorders_by_confidence(mock_breact_categorizer):
         delivery_address=Address("Test Street", "Test City", "12345", "Test Country"),
         delivery_transportation_type=None,
         delivery_emission_factor=None,
+        delivery=None,
         estimated_categories=["Beleuchtung", "Elektronik", "Haushaltsgeraete", "Service"],
         estimated_matched_category="",
         category="",

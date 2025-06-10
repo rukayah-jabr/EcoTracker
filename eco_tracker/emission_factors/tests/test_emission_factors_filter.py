@@ -42,6 +42,7 @@ def product():
       delivery_emission_factor=None,
       delivery_distance=0,
       delivery_transportation_type=None,
+      delivery=None,
       weight=0,
       delivered_date=date(2021, 1, 1),
       co2_purchase=0,

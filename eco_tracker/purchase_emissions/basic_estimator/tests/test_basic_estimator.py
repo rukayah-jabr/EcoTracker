@@ -2,7 +2,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from eco_tracker.product import EmissionFactor, Product
+from eco_tracker.product import Delivery, EmissionFactor, Product
 from eco_tracker.purchase_emissions.basic_estimator.basic_estimator import BasicPurchaseEmissionsEstimator
 from eco_tracker.purchase_emissions.exceptions import NotSupportedMeasurementUnit, PurchaseEmissionFactorNotSet
 
@@ -98,4 +98,10 @@ def test_unsupported_unit_raises_exception(basic_estimator, product_with_unsuppo
     with pytest.raises(NotSupportedMeasurementUnit) as exc_info:
         basic_estimator.estimate_emissions(product_with_unsupported_unit)
     
-    assert product_with_unsupported_unit.emission_factor.activity_unit in str(exc_info.value) 
+    assert product_with_unsupported_unit.emission_factor.activity_unit in str(exc_info.value)
+    
+def test_returned_product_has_negative_emission(basic_estimator, product_with_euro_unit):
+    product_with_euro_unit.delivery = Mock(spec=Delivery)
+    product_with_euro_unit.delivery.type = 'R'
+    result = basic_estimator.estimate_emissions(product_with_euro_unit)
+    assert result < 0

@@ -1,7 +1,10 @@
-import pytest
 from datetime import date
+
+import pytest
+
 from eco_tracker.categorization.breact.breact_fe_categorization_filter import BreactFrontendCategorizationFilter
 from eco_tracker.product import Address, FailedSteps, Product
+
 
 class MockBreactCategorizer:
     def generate_categorization(self, description, num_of_categories=10):
@@ -12,7 +15,7 @@ class FailingMockBreactCategorizer:
         raise Exception("API error")
 
 def create_test_product() -> Product:
-        return Product(
+    return Product(
         delivered_date=date.today(),
         description="Espresso machine",
         unit="unit",
@@ -23,6 +26,7 @@ def create_test_product() -> Product:
         delivery_address=Address("Test Street", "Test City", "12345", "Test Country"),
         delivery_transportation_type=None,
         delivery_emission_factor=None,
+        delivery=None,
         estimated_categories=["Beleuchtung", "Elektronik", "Haushaltsgeraete", "Service"],
         estimated_matched_category="",
         category="",

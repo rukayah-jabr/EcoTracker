@@ -15,7 +15,7 @@ from eco_tracker.distance_estimation.open_route_service.open_route_service impor
 from eco_tracker.emission_factors.climatiq.climatiq import Climatiq
 from eco_tracker.emission_factors.emission_factors_filter import EmissionFactorsFilter
 from eco_tracker.pipeline import Pipeline
-from eco_tracker.product import Address, FailedSteps, Product
+from eco_tracker.product import Address, Delivery, FailedSteps, Product
 from eco_tracker.purchase_emissions.basic_estimator.basic_estimator import BasicPurchaseEmissionsEstimator
 from eco_tracker.purchase_emissions.purchase_estimator_filter import PurchaseEmissionsEstimatorFilter
 
@@ -80,10 +80,6 @@ def breact_fe_categorization_filter(breact_categorizer_mock) -> BreactFrontendCa
 	return BreactFrontendCategorizationFilter(breact_categorizer_mock)
 
 @pytest.fixture
-def distance_estimation_filter(open_route_service) -> DistanceEstimationFilter:
-	return DistanceEstimationFilter(open_route_service)
-
-@pytest.fixture
 def product():
 	return Product(
 		delivered_date=date(2024, 1, 1),
@@ -111,6 +107,12 @@ def product():
 		emission_factor=None,
 		delivery_emission_factor=None,
 		delivery_distance=0,
+		delivery=Delivery(
+			id=1,
+			name="Delivery 1",
+			type="N",
+			partner_name="Partner 1"
+		),
 		weight=0,
 		co2_purchase=0,
 		co2_transport=0,
@@ -124,7 +126,7 @@ def product():
 		)
 	)
 
-def test_estimate_category_1_emissions(emission_factors_filter, category_reorder_step, climatiq_categorizer_filter, purchase_emissions_estimator_filter, breact_fe_categorization_filter, distance_estimation_filter, product):
+def test_estimate_category_1_emissions(emission_factors_filter, category_reorder_step, climatiq_categorizer_filter, purchase_emissions_estimator_filter, breact_fe_categorization_filter, product):
 	pipeline = Pipeline[Product](
 		climatiq_categorizer_filter,
 		category_reorder_step,
@@ -141,3 +143,18 @@ def test_estimate_category_1_emissions(emission_factors_filter, category_reorder
 	assert product.emission_factor.activity_unit is not None
 	assert product.category is not None and product.category != ""
 	assert product.co2_purchase is not None
+
+
+def test_estimate_category_1_emissions_return_delivery(emission_factors_filter, category_reorder_step, climatiq_categorizer_filter, purchase_emissions_estimator_filter, breact_fe_categorization_filter, product):
+  product.delivery.type = 'R'
+  pipeline = Pipeline[Product](
+		climatiq_categorizer_filter,
+		category_reorder_step,
+		emission_factors_filter,
+		breact_fe_categorization_filter,
+		purchase_emissions_estimator_filter
+	)
+
+  pipeline(product)
+  
+  assert product.co2_purchase < 0
