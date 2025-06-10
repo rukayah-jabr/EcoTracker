@@ -19,6 +19,7 @@ declare module 'vue' {
     FetchDataButton: typeof import('./components/FetchDataButton.vue')['default']
     FilterDataButton: typeof import('./components/FilterDataButton.vue')['default']
     HelloWorld: typeof import('./components/WelcomeText.vue')['default']
+    ProductDetailsTable: typeof import('./components/ProductDetailsTable.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     WelcomeText: typeof import('./components/WelcomeText.vue')['default']

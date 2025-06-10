@@ -27,19 +27,38 @@ class BreactCategorizer(Categorizer):
 			return ["others"]
 		return [result.get("class", "others")]
 
-	#support function for determining best match
+	# for one category
 	def get_confidence_for_class(self, product: str, category: str) -> float:
 		result = self._classify(product, allowed_classes=[category])
 		if result.get("class") != category:
 			return 0.0
 		return result.get("confidence", 0.0)
 
+	#for multi cat
+	def generate_confidences(self, product: str, allowed_classes: list[str] | None = None) -> dict[str, float]:
+
+		result = self._classify(product, allowed_classes=allowed_classes, multi_class=True)
+		classifications = result.get("classifications", [])
+
+		# Optionally filter by allowed_classes
+		if allowed_classes is not None:
+			classifications = [
+				item for item in classifications if item["class"] in allowed_classes
+			]
+
+		return {item["class"]: item["confidence"] for item in classifications}
+
 	#actual call to API
-	def _classify(self, product: str, allowed_classes: list[str] | None = None) -> dict:
+	def _classify(
+			self,
+			product: str,
+			allowed_classes: list[str] | None = None,
+			multi_class: bool = False
+	) -> dict:
 		api_url_classifier = 'https://api-os.breact.ai/api/v1/services/classifier/process'
 		api_url_result = 'https://api-os.breact.ai/api/v1/services/result'
 
-		if allowed_classes is None: #in case of FE call
+		if allowed_classes is None:
 			allowed_classes = [
 				"Haushaltsgeraete", "Kaffee & Zubehoer", "Reinigung & Waschmittel",
 				"Batterien & Akkus", "Beleuchtung", "Elektronik",
@@ -51,7 +70,7 @@ class BreactCategorizer(Categorizer):
 			"context": {
 				"classificationType": "products",
 				"allowedClasses": allowed_classes,
-				"multiClass": False
+				"multiClass": multi_class
 			},
 			"config": {
 				"modelId": "mistral-large-2411",

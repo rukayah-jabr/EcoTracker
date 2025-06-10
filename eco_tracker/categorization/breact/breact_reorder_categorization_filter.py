@@ -12,16 +12,17 @@ class CategoryReorderFilter(PipelineStep):
             next_step(product)
             return
 
-        confidences = {}
-        for category in product.estimated_categories:
-            try:
-                confidence = self.categorizer.get_confidence_for_class(product.description, category)
-                if confidence >= 0.7:  # confidence threshold = 0.7, anything lower is discarded
-                    confidences[category] = confidence
-            except Exception:
-                confidences[category] = 0.0
-
-        sorted_categories = sorted(confidences.items(), key=lambda x: x[1], reverse=True)
+        # all print statements are only for demo
+        confidences = self.categorizer.generate_confidences(product.description, product.estimated_categories)
+        # confidence threshold 0.7
+        filtered_confidences = {
+            cat: conf for cat, conf in confidences.items()
+            if cat in product.estimated_categories and conf >= 0.7
+        }
+        print("Original estimated categories:", product.estimated_categories)
+        print("Confidences from API:", confidences)
+        sorted_categories = sorted(filtered_confidences.items(), key=lambda x: x[1], reverse=True)
         product.estimated_categories = [cat for cat, _ in sorted_categories]
+        print ("this is after reorder:", product.estimated_categories)
 
         next_step(product)
