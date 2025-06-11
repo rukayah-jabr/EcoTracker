@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Data Dashboard</h1>
+    <h1 class="mb-8">Data Dashboard</h1>
     <data-filter-group/>
     <emissions-over-time></emissions-over-time>
     <div class="my-10"></div>

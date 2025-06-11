@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="mb-5">Connect Your Data</h1>
+    <h1 class="mb-8">Connect Your Data</h1>
     <v-row>
       <v-col cols="4">
         <v-text-field
@@ -8,7 +8,7 @@
         v-model="store.apiEndpoint"
         prepend-icon="mdi-link"></v-text-field>
       </v-col>
-      <v-col cols="3">
+      <v-col cols="4">
         <DateFilter :defaultRange="dateRange"></DateFilter>
       </v-col>
     </v-row>

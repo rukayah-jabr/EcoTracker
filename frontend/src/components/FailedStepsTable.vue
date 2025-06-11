@@ -1,7 +1,10 @@
 <template>
   <div v-if="store.loaded && !store.isLoading">
       <!-- Temporary display of results for now -->
-      <h3 class="mt-8">Pipeline Steps:</h3>
+       <div class="mt-8 mb-4 border-t pt-5">
+        <h3>Pipeline Steps (dev/demo purposes)</h3>
+        <p><em>The table below displays the outcome of various steps within the estimation pipeline</em></p>
+       </div>
       <v-table>
         <thead>
           <tr>
@@ -9,10 +12,10 @@
               Product
             </th>
             <th>
-              <b>CO2 Estimate: Purchase</b>
+              CO₂ Estimate: Purchase
             </th>
             <th>
-              <b>CO2 Estimate: Transportation</b>
+              CO₂ Estimate: Transportation
             </th>
             <th>
               Categorized
@@ -24,7 +27,7 @@
               CO2 Factor Found
             </th>
             <th>
-              Purchase CO2
+              Purchase CO₂
             </th>
             <th>
               Distance Estimated
@@ -33,15 +36,15 @@
               Weight Estimated
             </th>
             <th>
-              Transportation CO2
+              Delivery CO₂
             </th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="record in store.rawData" :key="record.description">
             <td>{{ record.description }} <em>(Qty: {{ record.quantity }})</em></td>
-            <td><b>{{ record.co2_purchase.toFixed(3) }}</b></td>
-            <td><b>{{ record.co2_transport.toFixed(3) }}</b></td>
+            <td>{{ record.co2_purchase.toFixed(3) }}</td>
+            <td>{{ record.co2_transport.toFixed(3) }}</td>
             <td v-for="(value, key) in record.failed_steps" :key="key">
                <component :is="getStepStatusIcon(value)"/>
             </td>
@@ -61,7 +64,7 @@ const store = useDashboardStore()
 function getStepStatusIcon(value:boolean) {
   // Set success to true if step did not fail (e.g. failedStep == false)
   const iconName = value == false ? 'mdi-check-circle' : 'mdi-close-circle'
-  const iconColor = value == false ? 'green' : 'red'
+  const iconColor = value == false ? 'success' : 'error'
 
   return h(VIcon, { icon: iconName, color: iconColor })
 }
@@ -83,9 +86,7 @@ function formatDateToYMD(date: Date): string {
 }
 
 table th {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: .15em;
+  font-size: 12px;
   padding: 10px!important;
 }
 

@@ -11,7 +11,7 @@ from eco_tracker.utils.log import get_logger
 logger = get_logger("api_cache")
 
 # Setting to use cached data only (for dev purposes)
-CACHE_ONLY = False
+CACHE_ONLY = True
 
 # Thread-local storage for database connections
 _local = threading.local()
