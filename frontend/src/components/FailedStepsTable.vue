@@ -17,6 +17,9 @@
             <th>
               Categorized
             </th>
+             <th>
+              Reordered
+            </th>
             <th>
               CO2 Factor Found
             </th>

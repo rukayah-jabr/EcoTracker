@@ -52,11 +52,12 @@ def test_category_reorder_step_reorders_by_confidence(mock_breact_categorizer):
             emission_factor_fetching=False,
             purchase_co2_calculation=False,
             estimate_categories=False,
+            reorder_categories=False,
             distance_estimation=False,
             weight_estimation=False,
             delivery_emissions_estimation=False
         ),
-        confidence=0.7
+        min_emission_factor_confidence=0.7
     )
 
     next_step = MagicMock()  # fake a call to check later

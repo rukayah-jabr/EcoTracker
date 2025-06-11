@@ -40,7 +40,7 @@ class FullPipeline:
         self.breact_api_key = breact_api_key
         self.open_route_service_api_key = open_route_service_api_key
         
-    def calculate_emissions(self, erp_url: str, start_date: datetime | None = None, end_date: datetime | None = None, confidence: float | None = None):
+    def calculate_emissions(self, erp_url: str, start_date: datetime | None = None, end_date: datetime | None = None, min_emission_factor_confidence: float | None = None):
         
         groq_categorizer: Categorizer = ClimatiqCategorizer(self.llm_api_key)
         breact_categorizer: Categorizer = BreactCategorizer(self.breact_api_key)
@@ -77,8 +77,8 @@ class FullPipeline:
         enriched_products = []
         for product in odoo_data.data:
             print("=========== START PIPELINE ==============")
-            product.confidence = confidence # Set confidence level for Climatiq emissions validation
-            print(f"Estimating emissions for {product.description} with confidence level of {product.confidence}")
+            product.min_emission_factor_confidence = min_emission_factor_confidence # Set confidence level for Climatiq emissions validation
+            print(f"Estimating emissions for {product.description} with confidence level of {product.min_emission_factor_confidence}")
             pipeline(product)
             enriched_products.append(product)
 

@@ -101,7 +101,7 @@ class BreactCategorizer(Categorizer):
 
 		return fetch_response(request_data)
 
-	def _poll_for_result(self, url: str, timeout: int = 45, interval: float = 3) -> dict:
+	def _poll_for_result(self, url: str, timeout: int = 120, interval: float = 3) -> dict:
 		start_time = time.time()
 		while time.time() - start_time < timeout:
 			response = requests.get(url, headers=self.headers)

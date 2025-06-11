@@ -10,13 +10,16 @@ from eco_tracker.utils.log import get_logger
 logger = get_logger(__name__)
 
 class ClimatiqCategorizer(Categorizer):
+
+	url = "https://api.groq.com/openai/v1/chat/completions"
+
 	def __init__(self, llm_api_key: str):
 		self.llm_api_key = llm_api_key
-		self.url = "https://api.groq.com/openai/v1/chat/completions"
 		self.authorization_headers = {"Authorization": f"Bearer {self.llm_api_key}"}
+		self.url = ClimatiqCategorizer.url
 
 
-	def generate_categorization(self, product: str, num_of_categories: int = 10, confidence: float = 0.7) -> list:
+	def generate_categorization(self, product: str, num_of_categories: int = 10, min_emission_factor_confidence: float = 0.7) -> list:
 		content = f"""
 				I have a product called ${product}.
 				I need to match it with an emission factor from a database (climatiq.io), but exact matches are rare.
@@ -37,7 +40,7 @@ class ClimatiqCategorizer(Categorizer):
 			}]
 		}
   
-		@api_cache.execute_or_get_from_cache(url=self.url, request=json.dumps({"product": product, "confidence": confidence}), save = False)
+		@api_cache.execute_or_get_from_cache(url=self.url, request=json.dumps({"product": product, "confidence": min_emission_factor_confidence}), save = False)
 		def fetch_categories(body: dict) -> list:
 			response = requests.post(self.url, json=body, headers=self.authorization_headers)
 			if response.status_code != HTTPStatus.OK:
@@ -49,9 +52,6 @@ class ClimatiqCategorizer(Categorizer):
 			return categories
  
 		return fetch_categories(body)
-	
-	def get_url(self):
-		return self.url
 
 def parse_generated_categories(llm_categories: str) -> list:
 	categories = []

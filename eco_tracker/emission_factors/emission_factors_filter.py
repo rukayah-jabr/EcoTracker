@@ -35,18 +35,18 @@ class EmissionFactorsFilter(PipelineStep):
 
                     confidence = self.categorizer.get_confidence_for_class(emission_factor.description, product.description)
                     print(f"Match confidence: {confidence}")
-                    print(f"Confidence threshold: {product.confidence}")
-                    if confidence < product.confidence:
+                    print(f"Confidence threshold: {product.min_emission_factor_confidence}")
+                    if confidence < product.min_emission_factor_confidence:
                         print(f"Low confidence, skipping: {confidence} for {category}")
                         continue  # Skip low-confidence match
                     
                     print(f"Factor found: {confidence} for {category}")
 
                     # Save categories to cache for future reuse (if cache doesn't already exist)
-                    url = ClimatiqCategorizer(os.getenv("LLM_API_KEY")).get_url()
-                    request = json.dumps({"product": product.description, "confidence": product.confidence})
+                    url = ClimatiqCategorizer.url
+                    request = json.dumps({"product": product.description, "confidence": product.min_emission_factor_confidence})
                     if not cached_api_call(url, request):
-                        print(f"Saving to cache: {product.description} with conf: {product.confidence}")
+                        print(f"Saving to cache: {product.description} with conf: {product.min_emission_factor_confidence}")
                         save_to_cache(url=url, request=request, response=json.dumps(list(product.estimated_categories)))
                     
                     product.emission_factor = emission_factor
@@ -58,7 +58,6 @@ class EmissionFactorsFilter(PipelineStep):
                     continue
                 except Exception as e:
                     logger.error(f"Error fetching emission factor for product {product.description}: {e}")
-                    raise e
 
         logger.error(f"No suitable emission factor found for product {product.description} with categories {product.estimated_categories}")
         product.failed_steps.emission_factor_fetching = True

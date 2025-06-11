@@ -7,7 +7,6 @@ from collections.abc import Callable
 from contextlib import contextmanager
 from datetime import datetime, timedelta
 from eco_tracker.utils.log import get_logger
-from eco_tracker.exceptions import CacheOnlyException
 
 logger = get_logger("api_cache")
 
@@ -119,6 +118,3 @@ def execute_or_get_from_cache(url: str, request: str, save:bool = True) -> Calla
         
         return wrapper
     return decorator
-
-# test = cached_api_call("https://api.groq.com/openai/v1/chat/completions", json.dumps({"product": "Kenwood KAX 941 PL Getreidemühle AA 25926", "confidence": 0.7}))
-# print(test)

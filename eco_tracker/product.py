@@ -5,6 +5,7 @@ from datetime import date
 @dataclass
 class FailedSteps:
 	estimate_categories: bool
+	reorder_categories: bool
 	emission_factor_fetching: bool
 	purchase_co2_calculation: bool
 	distance_estimation: bool
@@ -64,4 +65,4 @@ class Product:
 	co2_purchase: float | None
 	co2_transport: float | None
 	failed_steps: FailedSteps
-	confidence: float | None
+	min_emission_factor_confidence: float | None

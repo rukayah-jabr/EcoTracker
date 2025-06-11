@@ -94,8 +94,8 @@ def main():
             break
 
         # Set confidence for Climatiq emissions validation
-        product.confidence = 0.7
-        print(f"Using confidence: {product.confidence}")
+        product.min_emission_factor_confidence = 0.7
+        print(f"Using confidence: {product.min_emission_factor_confidence}")
 
         # Run pipeline
         pipeline(product)

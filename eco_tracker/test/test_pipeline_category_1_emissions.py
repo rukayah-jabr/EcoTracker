@@ -118,13 +118,14 @@ def product():
 		co2_transport=0,
 		failed_steps=FailedSteps(
 			estimate_categories=False,
+			reorder_categories=False,
 			emission_factor_fetching=False,
 			purchase_co2_calculation=False,
 			distance_estimation=False,
 			weight_estimation=False,
 			delivery_emissions_estimation=False
 		),
-		confidence=0.7
+		min_emission_factor_confidence=0.7
 	)
 
 def test_estimate_category_1_emissions(emission_factors_filter, category_reorder_step, climatiq_categorizer_filter, purchase_emissions_estimator_filter, breact_fe_categorization_filter, product):

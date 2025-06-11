@@ -100,7 +100,7 @@ async function loadData() {
   console.log("Setting date range: " + start + " to " + end)
 
   try {
-    const fetchUrl = "http://localhost:8069" + "&start_date=" + start + "&end_date=" + end
+    const fetchUrl = "http://localhost:8069" + "&start_date=" + start + "&end_date=" + end + "&min_emission_factor_confidence=0.2"
     records.value = await fetchEmissionsData(fetchUrl)
   } catch (err: any) {
     error.value = err.message || 'Failed to fetch data'

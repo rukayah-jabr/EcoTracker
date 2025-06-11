@@ -32,7 +32,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
 
     try {
       // http://localhost:8069
-      const fetchUrl = apiEndpoint.value + "&start_date=" + start + "&end_date=" + end + "&confidence=" + confidence
+      const fetchUrl = apiEndpoint.value + "&start_date=" + start + "&end_date=" + end + "&min_emission_factor_confidence=" + confidence
       rawData.value = await fetchEmissionsData(fetchUrl)
       
       // Add computed fields

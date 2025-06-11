@@ -7,15 +7,15 @@ logger = get_logger(__name__)
 
 class ClimatiqCategorizerFilter(PipelineStep):
 
-	def __init__(self, categorizer: Categorizer, num_of_categories: int = 15, confidence: float = 0.7):
+	def __init__(self, categorizer: Categorizer, num_of_categories: int = 15, min_emission_factor_confidence: float = 0.7):
 		self.categorizer = categorizer
 		self.num_of_categories = num_of_categories
 
 	def __call__(self, product: Product, next_step: NextStep) -> None:
-		self.confidence = product.confidence
+		self.min_emission_factor_confidence = product.min_emission_factor_confidence
 		try:
 			print("----------------------------------------\nPIPELINE STEP: ClimatiqCategorization")
-			product.estimated_categories = self.categorizer.generate_categorization(product.description, self.num_of_categories, self.confidence)
+			product.estimated_categories = self.categorizer.generate_categorization(product.description, self.num_of_categories, self.min_emission_factor_confidence)
 		except Exception as e:
 			logger.error(f"Error while generating estimate categories for product {product.description}: {e}")
 			product.failed_steps.estimate_categories = True

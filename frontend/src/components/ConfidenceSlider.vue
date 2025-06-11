@@ -19,7 +19,6 @@ import { ref, onMounted } from 'vue'
 const store = useDashboardStore()
 
 function onConfidenceChange(confidence: number) {
-    console.log(confidence)
     store.updateFilter('confidence', confidence)
 }
 </script>
