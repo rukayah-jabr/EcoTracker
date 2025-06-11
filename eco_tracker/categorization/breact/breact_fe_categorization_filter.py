@@ -7,6 +7,7 @@ class BreactFrontendCategorizationFilter(PipelineStep):
         self.categorizer = categorizer
 
     def __call__(self, product: Product, next_step: NextStep) -> None:
+        print("----------------------------------------\nPIPELINE STEP: Frontend Categorization")
         try:
             categories = self.categorizer.generate_categorization(product.description)
             if categories:

@@ -11,8 +11,9 @@ def test_api_client() -> TestClient:
 def test_calculate_emissions(test_api_client: TestClient):
     delivery_date_from = '2024-08-02' # a data with just 2 products
     delivery_date_to = '2024-08-02'
+    min_emission_factor_confidence = 0.7
   
-    response = test_api_client.get(f"/calculate-emissions?url=http://localhost:8069&start_date={delivery_date_from}&end_date={delivery_date_to}")
+    response = test_api_client.get(f"/calculate-emissions?url=http://localhost:8069&start_date={delivery_date_from}&end_date={delivery_date_to}&min_emission_factor_confidence={min_emission_factor_confidence}")
     assert response.status_code == 200
     
     body = response.json()
@@ -21,3 +22,4 @@ def test_calculate_emissions(test_api_client: TestClient):
     for product in body:
         assert product['delivered_date'] >= delivery_date_from
         assert product['delivered_date'] <= delivery_date_to
+        assert min_emission_factor_confidence == 0.7

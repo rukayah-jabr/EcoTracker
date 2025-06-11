@@ -39,10 +39,12 @@ def create_test_product() -> Product:
             emission_factor_fetching=False,
             purchase_co2_calculation=False,
             estimate_categories=False,
+            reorder_categories=False,
             distance_estimation=False,
             weight_estimation=False,
             delivery_emissions_estimation=False
-        )
+        ),
+        min_emission_factor_confidence=0.7
     )
 
 def test_breact_fe_categorization_assigns_category():

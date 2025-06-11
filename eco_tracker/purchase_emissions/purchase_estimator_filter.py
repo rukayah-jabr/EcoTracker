@@ -11,6 +11,7 @@ class PurchaseEmissionsEstimatorFilter(PipelineStep):
         self.estimator = estimator
 
     def __call__(self, product: Product, next_step: NextStep) -> None:
+        print("----------------------------------------\nPIPELINE STEP: Estimate Purchase Emissions")
         if product.failed_steps.emission_factor_fetching or product.emission_factor is None:
             product.failed_steps.purchase_co2_calculation = True
             next_step(product)

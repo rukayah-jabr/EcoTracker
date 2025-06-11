@@ -4,7 +4,7 @@
         <span v-if=store.loaded>Reimport Data</span>
         <span v-else>Import Data</span>
       </v-btn>
-      <div v-if="store.error" class="error">
+      <div v-if="store.error && !store.isLoading" class="error">
         {{ store.error }}
       </div>
       <v-alert v-if="store.loaded && !store.error && !store.isLoading"
@@ -30,6 +30,7 @@ const store = useDashboardStore()
 async function fetchData() {
     if (props.api) {
         store.apiEndpoint = props.api // set endpoint as text field value
+        store.error = ''
         store.loadData()
     }
 }

@@ -36,6 +36,7 @@ def test_full_pipeline(full_pipeline_instance):
   odoo_url = "http://localhost:8069"
   start_date = datetime.strptime("2024-08-02", "%Y-%m-%d")
   end_date = datetime.strptime("2024-08-02", "%Y-%m-%d")
+  min_emission_factor_confidence = 0.7
   
-  enriched_products = full_pipeline_instance.calculate_emissions(odoo_url, start_date, end_date)
+  enriched_products = full_pipeline_instance.calculate_emissions(odoo_url, start_date, end_date, min_emission_factor_confidence)
   assert len(enriched_products) > 0

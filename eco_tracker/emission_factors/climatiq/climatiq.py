@@ -78,6 +78,7 @@ class Climatiq(EmissionFactorsFetcher):
         }
 
         response = requests.get(url, params=query_params, headers=self.authorization_headers)
+
         if not response.ok:
             logger.error(f"Climatiq API returned error code for query: {query_params}")
             raise EmissionFactorInfoNotFound(query)
@@ -125,14 +126,16 @@ class Climatiq(EmissionFactorsFetcher):
             return response_json
         
         response_json = fetch_estimate(req_body)
-
-        return EmissionFactor(
-            co2e=response_json['co2e'],
-            co2e_unit=response_json['co2e_unit'],
-            activity_unit=get_our_activity_unit(ef_info.unit_type),
-            name=ef_info.name,
-            description=ef_info.description
-        )
+        if response_json is not None:
+            return EmissionFactor(
+                co2e=response_json['co2e'],
+                co2e_unit=response_json['co2e_unit'],
+                activity_unit=get_our_activity_unit(ef_info.unit_type),
+                name=ef_info.name,
+                description=ef_info.description
+            )
+        else:
+            raise exceptions.EmissionFactorNotFound(ef_info.activity_id)
 
     def fetch_emission_factor_from_query(self, query: str, unit: str = "number", data_version = '^21') -> EmissionFactor:
         climatiq_unit_type = map_standardized_unit_to_climatiq_units(unit)

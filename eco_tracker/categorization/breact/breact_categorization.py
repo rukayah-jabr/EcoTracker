@@ -30,9 +30,13 @@ class BreactCategorizer(Categorizer):
 	# for one category
 	def get_confidence_for_class(self, product: str, category: str) -> float:
 		result = self._classify(product, allowed_classes=[category])
-		if result.get("class") != category:
+		print(result)
+		if result is not None:
+			if result.get("class") != category:
+				return 0.0
+			return result.get("confidence", 0.0)
+		else:
 			return 0.0
-		return result.get("confidence", 0.0)
 
 	#for multi cat
 	def generate_confidences(self, product: str, allowed_classes: list[str] | None = None) -> dict[str, float]:
@@ -97,7 +101,7 @@ class BreactCategorizer(Categorizer):
 
 		return fetch_response(request_data)
 
-	def _poll_for_result(self, url: str, timeout: int = 30, interval: float = 0.5) -> dict:
+	def _poll_for_result(self, url: str, timeout: int = 120, interval: float = 3) -> dict:
 		start_time = time.time()
 		while time.time() - start_time < timeout:
 			response = requests.get(url, headers=self.headers)

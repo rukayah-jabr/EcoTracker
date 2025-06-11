@@ -3,4 +3,3 @@ class HTTPException(Exception):
         self.status_code = status_code
         self.message = f"{message}: {status_code}"
         super().__init__(self.message)
-

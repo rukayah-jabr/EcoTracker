@@ -9,6 +9,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
   const rawData = ref<EmissionsDataRecord[]>([])
   const filters = ref({
     dateRange: [ new Date(2024, 7, 2), new Date(2024, 7, 2) ], // month index is 1 off from actual month
+    confidence: 0.7,
     category: [],
   })
   const filteredData = ref<EmissionsDataRecord[]>([])
@@ -25,12 +26,13 @@ export const useDashboardStore = defineStore('dashboard', () => {
 
     let start = filters.value.dateRange[0]
     let end = filters.value.dateRange[1] // uses last value in dynamic range
+    let confidence = filters.value.confidence
     
     console.log("Setting date range: " + start + " to " + end)
 
     try {
       // http://localhost:8069
-      const fetchUrl = apiEndpoint.value + "&start_date=" + start + "&end_date=" + end
+      const fetchUrl = apiEndpoint.value + "&start_date=" + start + "&end_date=" + end + "&min_emission_factor_confidence=" + confidence
       rawData.value = await fetchEmissionsData(fetchUrl)
       
       // Add computed fields

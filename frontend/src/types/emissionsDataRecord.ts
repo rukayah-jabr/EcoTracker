@@ -15,6 +15,7 @@ export interface Address {
   
   export interface FailedSteps {
     estimate_categories: boolean
+    reorder_categories: boolean
     emission_factor_fetching: boolean
     purchase_co2_calculation: boolean
     distance_estimation: boolean

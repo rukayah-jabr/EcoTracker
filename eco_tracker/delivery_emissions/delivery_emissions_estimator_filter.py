@@ -11,6 +11,7 @@ class DeliveryEmissionsEstimatorFilter(PipelineStep):
     self.delivery_emissions_estimator = delivery_emissions_estimator
 
   def __call__(self, product: Product, next_step: NextStep) -> None:
+    print("----------------------------------------\nPIPELINE STEP: Estimate Delivery/Transport Emissions")
     if not self._is_all_needed_data_available(product):
       logger.error(f"Delivery emissions estimation not calculated because distance estimation or weight estimation failed for product {product.description}")
       product.failed_steps.delivery_emissions_estimation = True
