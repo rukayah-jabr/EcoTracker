@@ -3,7 +3,9 @@
     <v-data-table
     :items="store.filteredData.value"
     :headers="headers"
-    items-per-page="50"
+    :sort-by="[{ key: sortColumn, order: 'desc' }]"
+    :items-per-page="itemsPerPage"
+    :hide-default-footer="hideFooter"
     color="primary"
     hover
     >
@@ -52,6 +54,16 @@
 
 <script lang="ts" setup>
 import { useDashboardStore } from '../stores/useDashboardStore'
+
+const props = withDefaults(defineProps<{
+  sortColumn?: string
+  itemsPerPage?: number
+  hideFooter?: boolean
+}>(), {
+  sortColumn: 'delivered_date',
+  itemsPerPage: 10,
+  hideFooter: false
+})
 
 const store = useDashboardStore()
 

@@ -38,14 +38,11 @@ def categorizer():
 
 @pytest.fixture
 def breact_categorizer_mock():
-	mock = MagicMock()
-	mock.get_confidence_for_class.return_value = 1.0
-	mock.generate_confidences.return_value = {
-			"laptop": 0.95,
-			"notebook": 0.9,
-			"computer": 0.85
-		}
-	return mock
+	load_dotenv()
+	breact_api_key = os.getenv("BREACT_API_KEY")
+	if not breact_api_key:
+		raise ValueError("BREACT_API_KEY is not set")
+	return BreactCategorizer(breact_api_key)
 
 @pytest.fixture
 def open_route_service():

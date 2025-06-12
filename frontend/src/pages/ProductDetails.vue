@@ -7,7 +7,7 @@
       <NoResults></NoResults>
     </div>
     <div v-else>
-      <ProductDetailsTable/>
+      <ProductDetailsTable :items-per-page="50" />
     </div>
   </div>
 </template>

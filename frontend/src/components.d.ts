@@ -27,6 +27,7 @@ declare module 'vue' {
     ProductDetailsTable: typeof import('./components/ProductDetailsTable.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    TopEmittingProducts: typeof import('./components/TopEmittingProducts.vue')['default']
     WelcomeText: typeof import('./components/WelcomeText.vue')['default']
   }
 }

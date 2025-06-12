@@ -9,12 +9,13 @@
     <emissions-over-time></emissions-over-time>
     <div class="my-10"></div>
     <emissions-per-category></emissions-per-category>
+    <div class="my-10"></div>
+    <top-emitting-products></top-emitting-products>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { useDashboardStore } from '../stores/useDashboardStore';
+import { useDashboardStore } from "../stores/useDashboardStore";
 
-const store = useDashboardStore()
-
+const store = useDashboardStore();
 </script>
