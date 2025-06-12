@@ -1,6 +1,12 @@
 <template>
   <div>
-    <v-data-table :items="store.filteredData.value" :headers="headers" items-per-page="50" color="primary">
+    <v-data-table
+    :items="store.filteredData.value"
+    :headers="headers"
+    items-per-page="50"
+    color="primary"
+    hover
+    >
         <template v-slot:item.category="{ value }">
             <v-chip
             color="primary"

@@ -3,7 +3,7 @@
     <v-select
     clearable
     chips
-    label="Select category"
+    label="Filter category"
     :items="displayCategories"
     v-model="store.filters.category"
     multiple

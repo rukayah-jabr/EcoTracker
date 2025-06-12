@@ -1,8 +1,14 @@
 <template>
   <div>
-    <h1 class="mb-8">Product Details</h1>
+    <h1>Product Details</h1>
+    <p class="font-italic mb-8">View product-level estimates calculated from your invoice data</p>
     <data-filter-group/>
-    <ProductDetailsTable/>
+    <div v-if="!store.loaded && !store.isLoading">
+      <NoResults></NoResults>
+    </div>
+    <div v-else>
+      <ProductDetailsTable/>
+    </div>
   </div>
 </template>
 
