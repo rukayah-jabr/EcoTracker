@@ -55,7 +55,7 @@ venv\Scripts\activate          # Windows
 pip install -r requirements.txt
 ````
 ### 🌐 Backend API
-Now you can interact with the backend directly via REST:
+Run the api. py and now you can interact with the backend directly via REST:
 GET localhost:8000/calculate-emissions/?url=http://localhost:8069&start_date=YYYY-MM-DD&end_date=YYYY-MM-DD
 
 ### ▶️Frontend Setup
