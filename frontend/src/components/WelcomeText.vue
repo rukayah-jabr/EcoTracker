@@ -2,9 +2,12 @@
   <v-container max-width="900">
     <!-- Temporary text filler -->
     <div>
-      <div class="my-8 text-center">
-        <div class="text-body-2 font-weight-light mb-2">Welcome to</div>
-        <h1 class="text-h2 font-weight-bold">EcoTracker</h1>
+      <div class="text-center">
+        <img src="../assets/BReact_logo.jpeg" style="max-width:180px">
+      </div>
+      <div class="mt-5 mb-8 text-center">
+        <div class="text-overline">Welcome to</div>
+        <h1 class="text-h3 font-weight-bold">EcoTracker</h1>
       </div>
 
       <v-row>
