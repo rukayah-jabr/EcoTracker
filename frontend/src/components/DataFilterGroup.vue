@@ -3,7 +3,7 @@
         <v-col cols="4">
             <DateFilter :defaultRange=defaultRange></DateFilter>
         </v-col>
-        <v-col>
+        <v-col cols="4">
             <CategoryFilter></CategoryFilter>
         </v-col>
     </v-row>

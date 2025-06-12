@@ -1,5 +1,5 @@
 <template>
-  <v-card class="pie-chart-card">
+  <v-card color="secondary" variant="flat" class="pie-chart-card">
     <v-card-title>{{ props.title }}</v-card-title>
     <v-card-text>
       <ApexChart width="100%" type="pie" :options="chartOptions" :series="series"/>

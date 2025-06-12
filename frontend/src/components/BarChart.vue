@@ -1,6 +1,6 @@
 <!-- components/BarChart.vue -->
 <template>
-  <v-card>
+  <v-card color="secondary" variant="flat">
     <v-card-title>{{ props.title }}</v-card-title>
     <v-card-text>
       <ApexChart type="bar" :options="chartOptions" :series="series" height="350" />

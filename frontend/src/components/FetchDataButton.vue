@@ -4,15 +4,19 @@
         <span v-if=store.loaded>Reimport Data</span>
         <span v-else>Import Data</span>
       </v-btn>
-      <div v-if="store.error && !store.isLoading" class="error">
-        {{ store.error }}
-      </div>
+      <v-alert v-if="store.error && !store.isLoading"
+        color="error"
+        icon="$error"
+        :text="store.error"
+        class="mt-5 w-xl-33 w-lg-50"
+        variant="tonal"
+      ></v-alert>
       <v-alert v-if="store.loaded && !store.error && !store.isLoading"
         color="success"
         icon="$success"
-        title="Data successfully imported"
-        text="Your purchase data has been successfully imported and calculated with emissions"
-        class="mt-5"
+        text="Success! Your invoice data has been imported and estimated"
+        class="mt-5 w-xl-33 w-lg-50"
+        variant="tonal"
         ></v-alert>
     </div>
 </template>

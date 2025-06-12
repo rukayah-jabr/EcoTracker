@@ -1,11 +1,17 @@
 <template>
   <div>
-    <v-data-table :items="store.filteredData.value" :headers="headers">
+    <v-data-table
+    :items="store.filteredData.value"
+    :headers="headers"
+    items-per-page="50"
+    color="primary"
+    hover
+    >
         <template v-slot:item.category="{ value }">
             <v-chip
-            color="secondary"
-            variant="outlined"
-            :text="value"></v-chip>
+            color="primary"
+            :text="value"
+            label></v-chip>
         </template>
         <template v-slot:item.co2_purchase="{ item }">
             <template v-if="item.failed_steps.purchase_co2_calculation">
@@ -32,7 +38,7 @@
                 </v-chip>
             </template>
             <template v-else>
-                {{ item.co2_transport.toFixed() }}
+                {{ item.co2_transport.toFixed(4) }}
             </template>
         </template>
         <template v-slot:item.co2_total="{ value }">
@@ -54,22 +60,16 @@ const headers = [
     { title: 'Product', value: 'description', sortable: true},
     { title: 'Quantity', value: 'quantity', align: 'center'},
     { title: 'Category', value: 'category', align: 'center', sortable: true},
-    { 
-        title: 'CO2 Emissions',
-        align: 'center',
-        children: [
-            { title: 'Purchase', value: 'co2_purchase', align: 'center', sortable: true},
-            { title: 'Transportation', value: 'co2_transport', align: 'center', sortable: true},
-            { title: 'Total', value: 'co2_total', align: 'center', sortable: true}
-        ]
-    }
+    { title: 'Purchase CO₂ Estimate', value: 'co2_purchase', align: 'center', sortable: true},
+    { title: 'Delivery CO₂ Estimate', value: 'co2_transport', align: 'center', sortable: true},
+    { title: 'Total CO₂ Estimate', value: 'co2_total', align: 'center', sortable: true}
 ]
 
 function getEmissionsColor (emissions:number) {
     // TODO: make this more dynamic/relative according to actual data
-    if (emissions > 100) return 'red'
-    else if (emissions > 50) return 'orange'
-    else return 'green'
+    if (emissions > 100) return 'error'
+    else if (emissions > 50) return 'warning'
+    else return 'success'
   }
 
 function getFailedResultFlag (failedStep:boolean) {

@@ -1,6 +1,6 @@
 <template>
   <WelcomeText />
-  <CalculateEmissionsTemp />
+  <!-- <CalculateEmissionsTemp /> -->
 </template>
 
 <script lang="ts" setup>

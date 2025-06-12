@@ -1,6 +1,7 @@
 <template>
   <div>
-    <h1 class="mb-5">Connect Your Data</h1>
+    <h1 class="">Connect Your Data</h1>
+    <p class="font-italic mb-8">Import and estimate your data directly from an external invoicing system (e.g. Odoo)</p>
     <v-row>
       <v-col cols="4">
         <v-text-field
@@ -8,7 +9,7 @@
         v-model="store.apiEndpoint"
         prepend-icon="mdi-link"></v-text-field>
       </v-col>
-      <v-col cols="3">
+      <v-col cols="4">
         <DateFilter :defaultRange="dateRange"></DateFilter>
       </v-col>
     </v-row>
@@ -18,6 +19,9 @@
       </v-col>
     </v-row>
     <fetch-data-button :api="store.apiEndpoint"></fetch-data-button>
+  </div>
+  <div v-if="!store.loaded && !store.isLoading">
+    <NoResults></NoResults>
   </div>
   <div>
     <failed-steps-table></failed-steps-table>
