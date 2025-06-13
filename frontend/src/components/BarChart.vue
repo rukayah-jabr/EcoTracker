@@ -56,7 +56,7 @@ const chartOptions = ref<ApexOptions>({
   },
   yaxis: {
     title: {
-      text: 'CO2 Emissions'
+      text: 'CO₂ Emissions'
     }
   },
   fill: {

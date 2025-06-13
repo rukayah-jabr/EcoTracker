@@ -19,7 +19,7 @@
             <template v-if="item.failed_steps.purchase_co2_calculation">
                 <v-chip
                 prepend-icon="mdi-alert"
-                color="orange"
+                color="warning"
                 dark
                 >
                 Could not estimate
@@ -33,7 +33,7 @@
             <template v-if="item.failed_steps.delivery_emissions_estimation">
                 <v-chip
                 prepend-icon="mdi-alert"
-                color="orange"
+                color="warning"
                 dark
                 >
                 Could not estimate
@@ -80,18 +80,9 @@ const headers = [
 function getEmissionsColor (emissions:number) {
     // TODO: make this more dynamic/relative according to actual data
     if (emissions > 100) return 'error'
-    else if (emissions > 50) return 'warning'
+    else if (emissions > 50) return 'orange'
+    else if (emissions < 0) return 'green'
     else return 'success'
   }
-
-function getFailedResultFlag (failedStep:boolean) {
-    if (!failedStep) {
-        return {
-            color: "orange",
-            icon: "mdi-alert"
-        };
-    }
-    return null;
-}
 
 </script>

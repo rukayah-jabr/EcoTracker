@@ -1,6 +1,6 @@
 <template>
   <div>
-      <BarChart v-if="store.loaded" title="Emissions Over Time" :series="series" :xaxis="categories"/>
+      <BarChart v-if="store.loaded" title="Emissions Over Time" :series="series" :xaxis="date"/>
   </div>
 </template>
 
@@ -16,7 +16,7 @@ const transportCo2 = computed(() => groupEmissionByDate("co2_transport"))
 const totalCo2 = computed(() => groupEmissionByDate("co2_total"))
 
 // Set x-axis (dates)
-const categories = computed(() =>
+const date = computed(() =>
   sortGroup(totalCo2.value).map(([date]) => date)
 )
 
@@ -31,7 +31,7 @@ const transportData = computed(() =>
 // Add to series object for Apex Chart
 const series = computed(() => [
   { name: 'Purchases', data: purchaseData },
-  { name: 'Transport', data: transportData}])
+  { name: 'Delivery', data: transportData}])
 
 
 function groupEmissionByDate(emissionsVar:string) {

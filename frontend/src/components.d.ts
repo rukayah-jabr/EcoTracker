@@ -16,6 +16,7 @@ declare module 'vue' {
     DataFilterGroup: typeof import('./components/DataFilterGroup.vue')['default']
     DataFilters: typeof import('./components/DataFilters.vue')['default']
     DateFilter: typeof import('./components/DateFilter.vue')['default']
+    EmissionMetrics: typeof import('./components/EmissionMetrics.vue')['default']
     EmissionsOverTime: typeof import('./components/EmissionsOverTime.vue')['default']
     EmissionsPerCategory: typeof import('./components/EmissionsPerCategory.vue')['default']
     FailedStepsTable: typeof import('./components/FailedStepsTable.vue')['default']

@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex justify-space-between">
-      <PieChart v-if="store.loaded" title="Product Emissions" :data="productEmissionsPerCategory" />
-      <PieChart v-if="store.loaded" title="Transportation Emissions" :data="transportationEmissionsPerCategory" />
+      <PieChart v-if="store.loaded" title="Purchase Emissions" :data="productEmissionsPerCategory" />
+      <PieChart v-if="store.loaded" title="Delivery Emissions" :data="transportationEmissionsPerCategory" />
   </div>
 </template>
 

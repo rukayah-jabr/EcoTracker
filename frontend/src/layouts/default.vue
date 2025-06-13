@@ -31,8 +31,8 @@
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
-    <v-main class="mx-10 my-7">
-      <div class="border border-primary pa-7 rounded-lg">
+    <v-main>
+      <div class="border border-primary pa-7 rounded-lg mx-10 my-7">
         <router-view />
       </div>
     </v-main>

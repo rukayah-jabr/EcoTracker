@@ -6,6 +6,7 @@
     <div v-if="!store.loaded && !store.isLoading">
       <NoResults></NoResults>
     </div>
+    <emission-metrics></emission-metrics>
     <emissions-over-time></emissions-over-time>
     <div class="my-10"></div>
     <emissions-per-category></emissions-per-category>
