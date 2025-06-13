@@ -49,19 +49,20 @@
             :text="(value).toFixed(4)"></v-chip>
         </template>
         <template v-slot:item.emission_factor="{ item }">
-            <v-tooltip location="top">
+            <v-tooltip location="top" max-width="920">
                 <template v-slot:activator="{ props }">
                     <v-btn
                         v-bind="props"
                         icon
                         color="primary"
-                        size="small"
+                        size="medium"
                         class="rounded-circle"
+                        variant="plain"
                     >
                         <v-icon>mdi-information</v-icon>
                     </v-btn>
                 </template>
-                <span><b>{{ item?.emission_factor?.name}}</b> <br> {{ item?.emission_factor?.description }}</span>
+                <span><span class="text-overline">Matched purchase emission factor:</span><br><b>{{ item?.emission_factor?.name}}</b> <br> {{ item?.emission_factor?.description }}</span>
             </v-tooltip>
         </template>
     </v-data-table>
@@ -91,7 +92,7 @@ const headers = [
     { title: 'Purchase CO₂ Estimate', value: 'co2_purchase', align: 'center', sortable: true},
     { title: 'Delivery CO₂ Estimate', value: 'co2_transport', align: 'center', sortable: true},
     { title: 'Total CO₂ Estimate', value: 'co2_total', align: 'center', sortable: true},
-    { title: 'Purchase Emission Factor', value: 'emission_factor', align: 'center', sortable: false},
+    { title: '', value: 'emission_factor', align: 'center', sortable: false},
 ]
 
 function getEmissionsColor (emissions:number) {
