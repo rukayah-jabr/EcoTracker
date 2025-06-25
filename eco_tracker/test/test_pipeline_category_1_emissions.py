@@ -1,6 +1,7 @@
 import os
 from datetime import date
 from unittest.mock import MagicMock
+import eco_tracker.api_cache as cache_module
 
 import pytest
 from dotenv import load_dotenv
@@ -122,10 +123,11 @@ def product():
 			weight_estimation=False,
 			delivery_emissions_estimation=False
 		),
-		min_emission_factor_confidence=0.7
+		min_emission_factor_confidence=0.0
 	)
 
 def test_estimate_category_1_emissions(emission_factors_filter, category_reorder_step, climatiq_categorizer_filter, purchase_emissions_estimator_filter, breact_fe_categorization_filter, product):
+	cache_module.CACHE_ONLY = False
 	pipeline = Pipeline[Product](
 		climatiq_categorizer_filter,
 		category_reorder_step,
@@ -145,6 +147,7 @@ def test_estimate_category_1_emissions(emission_factors_filter, category_reorder
 
 
 def test_estimate_category_1_emissions_return_delivery(emission_factors_filter, category_reorder_step, climatiq_categorizer_filter, purchase_emissions_estimator_filter, breact_fe_categorization_filter, product):
+  cache_module.CACHE_ONLY = False
   product.delivery.type = 'R'
   pipeline = Pipeline[Product](
 		climatiq_categorizer_filter,

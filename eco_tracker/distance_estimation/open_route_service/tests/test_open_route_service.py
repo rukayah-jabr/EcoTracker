@@ -1,100 +1,117 @@
-import os
-from unittest.mock import patch
-
 import pytest
-from dotenv import load_dotenv
+from unittest.mock import patch
+from geopy.distance import geodesic
 
-from eco_tracker.distance_estimation import exceptions
 from eco_tracker.distance_estimation.open_route_service.open_route_service import OpenRouteService
+from eco_tracker.distance_estimation import exceptions
 
+API_KEY = "dummy_key"
 
-@pytest.fixture
-def open_route_service():
-    load_dotenv()
-    api_key = os.getenv("OPEN_ROUTE_SERVICE_API_KEY")
-    if not api_key:
-        pytest.skip("OPEN_ROUTE_SERVICE_API_KEY not found in environment variables")
-    return OpenRouteService(api_key=api_key)
+class TestOpenRouteService:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.ors = OpenRouteService(api_key=API_KEY)
 
+    @patch('eco_tracker.distance_estimation.open_route_service.open_route_service.api_cache.execute_or_get_from_cache')
+    def test_get_route_distance_success(self, mock_cache):
+        # make decorator a no-op
+        mock_cache.side_effect = lambda *args, **kwargs: lambda f: f
+        with patch.object(self.ors.client, 'directions', return_value={
+            'features': [{'properties': {'segments': [{'distance': 12345}]}}]
+        }):
+            dist = self.ors.get_route_distance((1.0, 2.0), (3.0, 4.0))
+            assert dist == pytest.approx(12.345)
 
-def test_openrouteservice_instance(open_route_service):
-    assert open_route_service is not None
+    @patch('eco_tracker.distance_estimation.open_route_service.open_route_service.api_cache.execute_or_get_from_cache')
+    def test_get_route_distance_failure(self, mock_cache):
+        mock_cache.side_effect = lambda *args, **kwargs: lambda f: f
+        with patch.object(self.ors.client, 'directions', side_effect=Exception("API failure")):
+            with pytest.raises(exceptions.RouteDistanceFailed):
+                self.ors.get_route_distance((1.0, 2.0), (3.0, 4.0))
 
-def test_get_location_coordinates_amstetten_stadtwerke(open_route_service):
-    coordinates = open_route_service.get_location_coordinates("Stadtwerkestr. 2 Amstetten 3300 AT")
-    assert coordinates is not None
-    
-    # Stadtwerkestr. 2 Amstetten 3300 AT
-    expected_lon = 14.866910135695726
-    expected_lat = 48.11370424217792
-    
-    assert abs(coordinates[0] - expected_lon) < 0.01 # longitude
-    assert abs(coordinates[1] - expected_lat) < 0.01 # latitude
+    @patch('eco_tracker.distance_estimation.open_route_service.open_route_service.api_cache.execute_or_get_from_cache')
+    def test_get_location_coordinates_success(self, mock_cache):
+        mock_cache.side_effect = lambda *args, **kwargs: lambda f: f
+        mock_geojson = {
+            "features": [
+                {"properties": {"confidence": 0.8}, "geometry": {"coordinates": (10.0, 20.0)}}
+            ]
+        }
+        with patch.object(self.ors.client, 'pelias_search', return_value=mock_geojson):
+            coords = self.ors.get_location_coordinates("valid address")
+            assert coords == (10.0, 20.0)
 
-def test_get_location_coordinates_amstetten_mitterfeldstrasse(open_route_service):
-    coordinates = open_route_service.get_location_coordinates("Mitterfeldstraße 7, Amstetten, None 3300 AT")
-    assert coordinates is not None
-    
-    # Mitterfeldstraße 7, Amstetten, None 3300 AT
-    expected_lon = 14.891356939571969
-    expected_lat = 48.12452351273868
-    
-    assert abs(coordinates[0] - expected_lon) < 0.01 # longitude
-    assert abs(coordinates[1] - expected_lat) < 0.01 # latitude
+    @patch('eco_tracker.distance_estimation.open_route_service.open_route_service.api_cache.execute_or_get_from_cache')
+    def test_get_location_coordinates_no_features(self, mock_cache):
+        mock_cache.side_effect = lambda *args, **kwargs: lambda f: f
+        with patch.object(self.ors.client, 'pelias_search', return_value={"features": []}):
+            with pytest.raises(exceptions.CoordinatesNotFound):
+                self.ors.get_location_coordinates("no features")
 
-def test_get_location_coordinates_many_matching_locations(open_route_service):
-    coordinates = open_route_service.get_location_coordinates("Industriepark Strasse A-8, 39245 Gommern, DE - ")
-    
-    # Industriepark Strasse A-9, 39245 Gommern, DE
-    expected_lon = 11.816256055912472
-    expected_lat = 52.08276960358608
-    
-    assert abs(coordinates[0] - expected_lon) < 0.01 # longitude
-    assert abs(coordinates[1] - expected_lat) < 0.01 # latitude
+    @patch('eco_tracker.distance_estimation.open_route_service.open_route_service.api_cache.execute_or_get_from_cache')
+    def test_get_location_coordinates_low_confidence_skips(self, mock_cache):
+        mock_cache.side_effect = lambda *args, **kwargs: lambda f: f
+        mock_geojson = {
+            "features": [
+                {"properties": {"confidence": 0.6}, "geometry": {"coordinates": (10.0, 20.0)}}
+            ]
+        }
+        with patch.object(self.ors.client, 'pelias_search', return_value=mock_geojson):
+            with pytest.raises(exceptions.CoordinatesNotFound):
+                self.ors.get_location_coordinates("low confidence")
 
-@patch("openrouteservice.Client.pelias_search")
-@patch("eco_tracker.api_cache.cached_api_call")
-def test_get_location_coordinates_low_confidence(mock_cached_api_call, mock_pelias_search, open_route_service):
-    mock_cached_api_call.return_value = None
-    mock_pelias_search.return_value = {
-        "features": [
-            {"properties": {"confidence": 0.5}},
-            {"properties": {"confidence": 0.6}}
-        ]
-    }
-    
-    with pytest.raises(exceptions.CoordinatesNotFound):
-        open_route_service.get_location_coordinates("Industriepark Strasse A-9, 39245 Gommern, DE - saved in cache")
+    @patch('eco_tracker.distance_estimation.open_route_service.open_route_service.api_cache.execute_or_get_from_cache')
+    def test_get_location_coordinates_many_matching_coordinates(self, mock_cache):
+        mock_cache.side_effect = lambda *args, **kwargs: lambda f: f
+        mock_geojson = {
+            "features": [
+                {"properties": {"confidence": 0.8}, "geometry": {"coordinates": (10.0, 20.0)}},
+                {"properties": {"confidence": 0.9}, "geometry": {"coordinates": (100.0, 200.0)}},
+            ]
+        }
+        with patch.object(self.ors.client, 'pelias_search', return_value=mock_geojson), \
+             patch.object(self.ors, 'get_distance_between_coordinates', return_value=11):
+            with pytest.raises(exceptions.ManyMatchingCoordinatesFound):
+                self.ors.get_location_coordinates("multiple far matches")
 
-def test_get_location_coordinates_invalid_address(open_route_service):
-    with pytest.raises(exceptions.ManyMatchingCoordinatesFound):
-        open_route_service.get_location_coordinates("NAME OF A BUSINESS Fake street 2, not existent, 1234 something")
+    @patch('eco_tracker.distance_estimation.open_route_service.open_route_service.api_cache.execute_or_get_from_cache')
+    def test_get_location_coordinates_api_exception(self, mock_cache):
+        mock_cache.side_effect = lambda *args, **kwargs: lambda f: f
+        with patch.object(self.ors.client, 'pelias_search', side_effect=Exception("API error")):
+            with pytest.raises(exceptions.CoordinatesNotFound):
+                self.ors.get_location_coordinates("api error")
 
+    def test_get_distance_between_coordinates(self):
+        start = (50.0, 5.0)
+        end = (51.0, 6.0)
+        expected_distance = geodesic((5.0, 50.0), (6.0, 51.0)).km
+        dist = self.ors.get_distance_between_coordinates(start, end)
+        assert dist == pytest.approx(expected_distance)
 
-def test_get_route_distance(open_route_service):
-    start, end = [14.891724, 48.123624], [14.866343, 48.112375]
-    assert open_route_service.get_route_distance(start, end) is not None
+    @patch('eco_tracker.distance_estimation.open_route_service.open_route_service.OpenRouteService.get_location_coordinates')
+    @patch('eco_tracker.distance_estimation.open_route_service.open_route_service.OpenRouteService.get_route_distance')
+    def test_get_distance_from_delivery_address_success(self, mock_route_dist, mock_loc_coords):
+        mock_loc_coords.side_effect = [(10.0, 20.0), (11.0, 21.0)]
+        mock_route_dist.return_value = 5.0
+        dist = self.ors.get_distance_from_delivery_address("supplier", "delivery")
+        assert dist == 5.0
 
-def test_get_route_distance_invalid_coordinates(open_route_service):
-    with pytest.raises(exceptions.RouteDistanceFailed):
-        start, end = [0,0], [0,0]
-        open_route_service.get_route_distance(start, end)
+    @patch('eco_tracker.distance_estimation.open_route_service.open_route_service.OpenRouteService.get_location_coordinates')
+    def test_get_distance_from_delivery_address_same_coordinates(self, mock_loc_coords):
+        mock_loc_coords.side_effect = [(10.0, 20.0), (10.0, 20.0)]
+        dist = self.ors.get_distance_from_delivery_address("supplier", "delivery")
+        assert dist == 0
 
-def test_get_distance_from_delivery_address(open_route_service):
-    distance = open_route_service.get_distance_from_delivery_address("Stadtwerkestr. 2 Amstetten 3300 AT", "Mitterfeldstraße 7, Amstetten, 3300 AT")
-    expected_distance = 3.9
-    
-    assert distance is not None
-    assert abs(distance - expected_distance) < 0.1
+    @patch('eco_tracker.distance_estimation.open_route_service.open_route_service.OpenRouteService.get_location_coordinates')
+    def test_get_distance_from_delivery_address_coordinates_not_found(self, mock_loc_coords):
+        mock_loc_coords.side_effect = exceptions.CoordinatesNotFound("addr")
+        with pytest.raises(exceptions.CoordinatesNotFound):
+            self.ors.get_distance_from_delivery_address("supplier", "delivery")
 
-def test_get_distance_from_delivery_address_longer_distance(open_route_service):
-    distance = open_route_service.get_distance_from_delivery_address("Stadtwerkestr. 2 Amstetten 3300 AT", "Favoritenstraße 226, 1100 Wien")
-    expected_distance = 134.0
-    
-    assert distance is not None
-    assert abs(distance - expected_distance) < 5
-
-def test_get_distance_from_delivery_address_invalid_address(open_route_service):
-    with pytest.raises(exceptions.ManyMatchingCoordinatesFound):
-        open_route_service.get_distance_from_delivery_address("Stadtwerkestr. 2 Amstetten 3300 AT", "NAME OF A BUSINESS Fake street 2, random city, 1234 country")
-        
+    @patch('eco_tracker.distance_estimation.open_route_service.open_route_service.OpenRouteService.get_location_coordinates')
+    @patch('eco_tracker.distance_estimation.open_route_service.open_route_service.OpenRouteService.get_route_distance')
+    def test_get_distance_from_delivery_address_route_distance_failed(self, mock_route_dist, mock_loc_coords):
+        mock_loc_coords.side_effect = [(10.0, 20.0), (11.0, 21.0)]
+        mock_route_dist.return_value = None
+        with pytest.raises(exceptions.RouteDistanceFailed):
+            self.ors.get_distance_from_delivery_address("supplier", "delivery")
