@@ -50,7 +50,7 @@ jobs:
 
     - name: Start backend (FastAPI)
       run: nohup python eco_tracker/api.py &
-      working-directory: ./ # optional, falls api.py im Root ist
+      working-directory: ./ # optional
 
     - name: Start frontend (Vite)
       working-directory: ecotracker/frontend
