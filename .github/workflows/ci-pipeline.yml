@@ -43,7 +43,7 @@ jobs:
 
     - name: Clone and start ecotracker-odoo
       run: |
-        git clone https://github.com/jessicadraper/ecotracker-odoo.git
+        git clone https://${{ secrets.ODOO_FORK_TOKEN }}@github.com/rukayah-jabr/ecotracker-odoo.git
         cd ecotracker-odoo
         pip install -r requirements.txt
         nohup python app.py &
