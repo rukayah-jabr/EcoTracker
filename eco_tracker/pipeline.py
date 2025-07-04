@@ -1,52 +1,46 @@
-
 from abc import abstractmethod
-from typing import Callable, List, Optional, Protocol, TypeVar
+from typing import Callable, List, Optional, Protocol
 
-Context = TypeVar('Context')
-# NextStep is a function that takes a context and returns an iterable of contexts or exceptions
-# It has the same signature as the PipelineCursor.__call__ method
-NextStep = Callable[[Context], None]
-ErrorHandler = Callable[[Exception, Context, NextStep], None]
+# Weglassen des Typparameters Context
+NextStep = Callable[[object], None]
+ErrorHandler = Callable[[Exception, object, NextStep], None]
 
-class PipelineStep[Context](Protocol):
-	@abstractmethod
-	def __call__(
-		self, context: Context, next_step: NextStep
-	) -> None:
-		...
+class PipelineStep(Protocol):
+    @abstractmethod
+    def __call__(self, context: object, next_step: NextStep) -> None:
+        ...
 
-class PipelineCursor[Context]:
+class PipelineCursor:
 
-	def __init__(self, steps: List[PipelineStep], error_handler: ErrorHandler):
-		self.steps = steps
-		self.error_handler: ErrorHandler = error_handler
+    def __init__(self, steps: List[PipelineStep], error_handler: ErrorHandler):
+        self.steps = steps
+        self.error_handler = error_handler
 
-	def __call__(self, context: Context) -> None:
-		if not self.steps:
-			return
+    def __call__(self, context: object) -> None:
+        if not self.steps:
+            return
 
-		current_step: PipelineStep = self.steps[0] # We get pipeline step
-		next_step = PipelineCursor(self.steps[1:], self.error_handler)
+        current_step = self.steps[0]
+        next_step = PipelineCursor(self.steps[1:], self.error_handler)
 
-		try:
-			current_step(context, next_step)
-		except Exception as e:
-			self.error_handler(e, context, next_step)
+        try:
+            current_step(context, next_step)
+        except Exception as e:
+            self.error_handler(e, context, next_step)
 
-def _default_error_handler(error: Exception, context: Context, next_step: NextStep) -> None:
-	raise error
+def _default_error_handler(error: Exception, context: object, next_step: NextStep) -> None:
+    raise error
 
-class Pipeline[Context]:
-	def __init__(self, *steps: PipelineStep):
-		self.steps = [step for step in steps]
+class Pipeline:
+    def __init__(self, *steps: PipelineStep):
+        self.steps = [step for step in steps]
 
-	def append(self, step: PipelineStep) -> None:
-		self.steps.append(step)
+    def append(self, step: PipelineStep) -> None:
+        self.steps.append(step)
 
-	def __call__(self, context: Context, error_handler: Optional[ErrorHandler] = None) -> None:
-		execute = PipelineCursor(self.steps, error_handler or _default_error_handler)
-		execute(context)
+    def __call__(self, context: object, error_handler: Optional[ErrorHandler] = None) -> None:
+        execute = PipelineCursor(self.steps, error_handler or _default_error_handler)
+        execute(context)
 
-	def __len__(self) -> int:
-		return len(self.steps)
-
+    def __len__(self) -> int:
+        return len(self.steps)
