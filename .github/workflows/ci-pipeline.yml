@@ -91,3 +91,4 @@ jobs:
 
     - name: Run Playwright UI test
       run: python playwright-ui-tests/example.py
+
