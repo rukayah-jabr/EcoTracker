@@ -7,6 +7,9 @@ module.exports = defineConfig({
   use: {
     baseURL: 'http://localhost:3000',
     headless: true,
+    launchOptions: {
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    },
     viewport: { width: 1280, height: 720 },
   },
   webServer: {

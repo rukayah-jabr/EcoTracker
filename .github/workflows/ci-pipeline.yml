@@ -77,6 +77,9 @@ jobs:
         npm install -D playwright
         npx playwright install
 
+    - name: Install Playwright dependencies
+      run: npx playwright install-deps
+
     - name: Run unit/integration tests (all except API/e2e)
       run: |
         pytest \
@@ -95,5 +98,5 @@ jobs:
         npx playwright install
 
     - name: Run Playwright UI test
-      run: python playwright-ui-tests/example.py
+      run: npx playwright test
 
