@@ -75,14 +75,14 @@ jobs:
     - name: Run unit/integration tests (all except API/e2e)
       run: |
         pytest \
-          --ignore-glob="**/test_pipeline_category_1_emissions.py" \
-          --ignore-glob="**/test_pipeline_category_4_emissions.py"
+          --ignore="eco_tracker/test/test_pipeline_category_1_emissions.py" \
+          --ignore="eco_tracker/test/test_pipeline_category_4_emissions.py"
 
     - name: Run test_pipeline_category_1_emissions (API)
-      run: pytest **/test_pipeline_category_1_emissions.py
+      run: pytest eco_tracker/test/test_pipeline_category_1_emissions.py
 
     - name: Run test_pipeline_category_4_emissions (E2E)
-      run: pytest **/test_pipeline_category_4_emissions.py
+      run: pytest eco_tracker/test/test_pipeline_category_4_emissions.py
 
     - name: Install Playwright
       run: |
