@@ -126,37 +126,51 @@ def product():
 		min_emission_factor_confidence=0.0
 	)
 
-def test_estimate_category_1_emissions(emission_factors_filter, category_reorder_step, climatiq_categorizer_filter, purchase_emissions_estimator_filter, breact_fe_categorization_filter, product):
-	cache_module.CACHE_ONLY = False
-	pipeline = Pipeline[Product](
-		climatiq_categorizer_filter,
-		category_reorder_step,
-		emission_factors_filter,
-		breact_fe_categorization_filter,
-		purchase_emissions_estimator_filter
-	)
+def test_estimate_category_1_emissions(
+    emission_factors_filter,
+    category_reorder_step,
+    climatiq_categorizer_filter,
+    purchase_emissions_estimator_filter,
+    breact_fe_categorization_filter,
+    product,
+):
+    cache_module.CACHE_ONLY = False
+    pipeline = Pipeline(
+        climatiq_categorizer_filter,
+        category_reorder_step,
+        emission_factors_filter,
+        breact_fe_categorization_filter,
+        purchase_emissions_estimator_filter,
+    )
 
-	pipeline(product)
+    pipeline(product)
 
-	assert product.estimated_categories is not None
-	assert product.emission_factor.co2e is not None
-	assert product.emission_factor.co2e_unit is not None
-	assert product.emission_factor.activity_unit is not None
-	assert product.category is not None and product.category != ""
-	assert product.co2_purchase is not None
+    assert product.estimated_categories is not None
+    assert product.emission_factor.co2e is not None
+    assert product.emission_factor.co2e_unit is not None
+    assert product.emission_factor.activity_unit is not None
+    assert product.category is not None and product.category != ""
+    assert product.co2_purchase is not None
 
 
-def test_estimate_category_1_emissions_return_delivery(emission_factors_filter, category_reorder_step, climatiq_categorizer_filter, purchase_emissions_estimator_filter, breact_fe_categorization_filter, product):
-  cache_module.CACHE_ONLY = False
-  product.delivery.type = 'R'
-  pipeline = Pipeline[Product](
-		climatiq_categorizer_filter,
-		category_reorder_step,
-		emission_factors_filter,
-		breact_fe_categorization_filter,
-		purchase_emissions_estimator_filter
-	)
+def test_estimate_category_1_emissions_return_delivery(
+    emission_factors_filter,
+    category_reorder_step,
+    climatiq_categorizer_filter,
+    purchase_emissions_estimator_filter,
+    breact_fe_categorization_filter,
+    product,
+):
+    cache_module.CACHE_ONLY = False
+    product.delivery.type = "R"
+    pipeline = Pipeline(
+        climatiq_categorizer_filter,
+        category_reorder_step,
+        emission_factors_filter,
+        breact_fe_categorization_filter,
+        purchase_emissions_estimator_filter,
+    )
 
-  pipeline(product)
-  
-  assert product.co2_purchase < 0
+    pipeline(product)
+
+    assert product.co2_purchase < 0
