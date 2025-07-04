@@ -53,7 +53,7 @@ jobs:
       working-directory: ./ # optional
 
     - name: Start frontend (Vite)
-      working-directory: ecotracker/frontend
+      working-directory: frontend
       run: nohup npm run dev &
 
     - name: Wait for services to start
