@@ -28,6 +28,9 @@ def test_001_estimation_low(page: Page):
     # Import data
     page.get_by_role("button", name="Import Data").click()
 
+    #wait
+    page.wait_for_selector("text=Success! Your invoice data has been imported and estimated")
+
     # Assert success
     expect(page.get_by_role("main")).to_contain_text("Success! Your invoice data has been imported and estimated")
 
