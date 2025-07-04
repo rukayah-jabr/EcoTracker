@@ -72,6 +72,11 @@ jobs:
           sleep 2
         done
 
+    - name: Install Playwright
+      run: |
+        npm install -D playwright
+        npx playwright install
+
     - name: Run unit/integration tests (all except API/e2e)
       run: |
         pytest \
