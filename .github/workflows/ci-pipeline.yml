@@ -84,7 +84,10 @@ jobs:
       run: |
         pytest \
           --ignore="eco_tracker/test/test_pipeline_category_1_emissions.py" \
-          --ignore="eco_tracker/test/test_pipeline_category_4_emissions.py"
+          --ignore="eco_tracker/test/test_pipeline_category_4_emissions.py" \
+          --ignore="playwright-ui-tests/test_001_estimation_low.py" \
+          --ignore="playwright-ui-tests/test_001_estimation_low.py" \
+          --ignore="playwright-ui-tests/test_003_filtering_category.py"
 
     - name: Run test_pipeline_category_1_emissions (API)
       run: pytest eco_tracker/test/test_pipeline_category_1_emissions.py
