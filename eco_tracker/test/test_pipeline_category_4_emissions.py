@@ -99,9 +99,16 @@ def product():
 		),
 		min_emission_factor_confidence=0.7
 	)
- 
-def test_estimate_category_4_emissions(distance_estimation_filter, emission_factors_transportation_filter, weight_estimation_filter, delivery_emissions_estimator_filter, product):
-	pipeline = Pipeline[Product](
+
+
+def test_estimate_category_4_emissions(
+		distance_estimation_filter,
+		emission_factors_transportation_filter,
+		weight_estimation_filter,
+		delivery_emissions_estimator_filter,
+		product
+):
+	pipeline = Pipeline(
 		distance_estimation_filter,
 		emission_factors_transportation_filter,
 		weight_estimation_filter,
