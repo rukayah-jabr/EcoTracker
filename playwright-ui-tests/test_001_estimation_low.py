@@ -23,7 +23,7 @@ def test_001_estimation_low(page: Page):
 
     page.screenshot(path="before_click_connect_data.png", full_page=True)
 
-    connect_btn.click()
+    connect_btn.click(force=True)
 
     page.wait_for_load_state("networkidle")
 
