@@ -23,32 +23,36 @@ def test_001_estimation_low(page: Page):
 
     page.screenshot(path="before_click_connect_data.png", full_page=True)
 
-    connect_btn.click(force=True)
+    # Try to wait for navigation to /connect explicitly
+    try:
+        with page.expect_navigation(url="**/connect", timeout=5000):
+            connect_btn.click(force=True)
+    except Exception:
+        # If navigation doesn't happen, click without waiting and try to wait for URL manually
+        connect_btn.click(force=True)
+        page.wait_for_url("**/connect", timeout=5000)
 
-    page.wait_for_load_state("networkidle")
+    print("Current URL after click:", page.url)
+    page.screenshot(path="after_click_connect_data.png", full_page=True)
 
-    # Take a screenshot of the 'Connect Data' page
-    page.screenshot(path="connect_page.png", full_page=True)
+    # Now check for the textbox input with expected value
+    txtbox = page.get_by_role("textbox", name="API Endpoint API Endpoint")
+    expect(txtbox).to_have_value("http://localhost:8069", timeout=5000)
 
-    # Assert test values
-    expect(page.get_by_role("textbox", name="API Endpoint API Endpoint")).to_have_value("http://localhost:8069")
-    expect(page.get_by_role("textbox", name="Select date range Select date")).to_have_value("08/02/2024 - 08/02/2024")
+    daterange = page.get_by_role("textbox", name="Select date range Select date")
+    expect(daterange).to_have_value("08/02/2024 - 08/02/2024")
 
     # Move confidence slider to 0
-    slider = page.locator(".v-slider")  # Adjust selector
+    slider = page.locator(".v-slider")  # Adjust selector if needed
     slider.wait_for(state="visible")
 
-    # Get the bounding box of the slider (for pixel positioning)
     box = slider.bounding_box()
-
-    # Drag the thumb to the left edge (value 0)
-    page.mouse.move(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)  # move to center first
+    page.mouse.move(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)  # center of slider
     page.mouse.down()
-    page.mouse.move(box["x"], box["y"] + box["height"] / 2, steps=10)  # drag to far left
+    page.mouse.move(box["x"], box["y"] + box["height"] / 2, steps=10)  # drag to left edge
     page.mouse.up()
 
-    # Assert confidence level
-    expect(page.get_by_role("slider")).to_contain_text("0.0")  # default, no change
+    expect(page.get_by_role("slider")).to_contain_text("0.0")
 
     # Import data
     page.get_by_role("button", name="Import Data").click()
@@ -56,7 +60,6 @@ def test_001_estimation_low(page: Page):
     # Wait for success message
     page.wait_for_selector("text=Success! Your invoice data has been imported and estimated")
 
-    # Assert success message
     expect(page.get_by_role("main")).to_contain_text("Success! Your invoice data has been imported and estimated")
 
     # Assert results for row 1
