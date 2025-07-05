@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ swt-assignment-5-ui-and-api-tests ]
+    branches: [ main ]
   pull_request:
-    branches: [ swt-assignment-5-ui-and-api-tests ]
+    branches: [ main ]
 
 jobs:
   build-and-test:
