@@ -82,3 +82,4 @@ def test_001_estimation_low(page: Page):
 
     # Assert no row 3
     expect(page.locator("tbody tr:nth-child(3)")).not_to_be_visible()
+
