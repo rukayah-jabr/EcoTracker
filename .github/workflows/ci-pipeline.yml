@@ -49,7 +49,7 @@ jobs:
         nohup python app.py &
 
     - name: Start backend (FastAPI)
-      run: nohup python eco_tracker/api.py  > backend.log 2>&1 &
+      run: nohup uvicorn eco_tracker.api:app --host 0.0.0.0 --port 8000 > backend.log 2>&1 &
       working-directory: ./ # optional
 
     - name: Wait for backend to start
