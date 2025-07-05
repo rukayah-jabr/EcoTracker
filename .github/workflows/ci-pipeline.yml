@@ -72,13 +72,13 @@ jobs:
           sleep 2
         done
 
-    - name: Install Playwright
-      run: |
-        npm install -D playwright
-        npx playwright install
+#    - name: Install Playwright
+#      run: |
+#        npm install -D playwright
+#        npx playwright install
 
-    - name: Install Playwright dependencies
-      run: npx playwright install-deps
+#    - name: Install Playwright dependencies
+#      run: npx playwright install-deps
 
     - name: Run unit/integration tests (all except API/e2e)
       run: |
@@ -95,11 +95,11 @@ jobs:
     - name: Run test_pipeline_category_4_emissions (E2E)
       run: pytest eco_tracker/test/test_pipeline_category_4_emissions.py
 
-    - name: Install Playwright
-      run: |
-        npm install -D playwright
-        npx playwright install
+#    - name: Install Playwright
+#      run: |
+#        npm install -D playwright
+#        npx playwright install
 
-    - name: Run Playwright UI test
-      run: npx playwright test
+    - name: Run Playwright UI tests (via pytest)
+      run: pytest playwright-ui-tests/
 
