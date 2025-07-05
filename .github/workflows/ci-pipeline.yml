@@ -49,8 +49,22 @@ jobs:
         nohup python app.py &
 
     - name: Start backend (FastAPI)
-      run: nohup python eco_tracker/api.py &
+      run: nohup python eco_tracker/api.py  > backend.log 2>&1 &
       working-directory: ./ # optional
+
+    - name: Wait for backend to start
+      run: |
+        for i in {1..30}; do
+          curl --silent --fail http://localhost:8000 && echo "Backend ready" && exit 0
+          echo "Waiting for backend..."
+          sleep 2
+        done
+        echo "Backend failed to start in time" >&2
+        exit 1
+
+    - name: Show backend logs for debugging
+      if: failure()
+      run: cat backend.log
 
     - name: Start frontend (Vite)
       working-directory: frontend
