@@ -134,3 +134,11 @@ jobs:
         DEBUG: "pw:api"
       run: pytest playwright-ui-tests/
 
+
+    - name: Upload screenshots if tests fail
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        name: playwright-screenshots
+        path: connect_page.png
+

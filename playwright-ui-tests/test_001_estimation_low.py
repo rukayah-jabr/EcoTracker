@@ -6,6 +6,9 @@ def test_001_estimation_low(page: Page):
     page.goto("http://localhost:3000/")
     page.get_by_role("link", name="Connect Data").click()
 
+    # Take a screenshot of the 'Connect Data' page
+    page.screenshot(path="connect_page.png", full_page=True)
+
     # Assert test values
     expect(page.get_by_role("textbox", name="API Endpoint API Endpoint")).to_have_value("http://localhost:8069")
     expect(page.get_by_role("textbox", name="Select date range Select date")).to_have_value("08/02/2024 - 08/02/2024")
