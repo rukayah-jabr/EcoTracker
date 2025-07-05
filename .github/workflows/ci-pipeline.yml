@@ -56,21 +56,26 @@ jobs:
       working-directory: frontend
       run: nohup npm run dev &
 
-    - name: Wait for services to start
+    - name: Wait for all services to start
       run: |
-        # Warten, bis Backend und Odoo verfügbar sind (Healthcheck)
-        for i in {1..15}; do
-          if curl --silent --fail http://localhost:8000; then
-            echo "Backend ready!"
-            break
-          fi
-          if curl --silent --fail http://localhost:8069; then
-            echo "Odoo ready!"
-            break
-          fi
-          echo "Waiting for services to start..."
+        for i in {1..30}; do
+          curl --silent --fail http://localhost:3000 && \
+          curl --silent --fail http://localhost:8000 && \
+          curl --silent --fail http://localhost:8069 && break
+          echo "Waiting for all services to start..."
           sleep 2
         done
+
+    - name: Debug services status
+      run: |
+        echo "Frontend status:"
+        curl -I http://localhost:3000
+        echo "Backend status:"
+        curl -I http://localhost:8000
+        echo "Odoo status:"
+        curl -I http://localhost:8069
+    
+    
 
 #    - name: Install Playwright
 #      run: |
@@ -104,5 +109,7 @@ jobs:
 #        npx playwright install
 
     - name: Run Playwright UI tests (via pytest)
+      env:
+        DEBUG: "pw:api"
       run: pytest playwright-ui-tests/
 
