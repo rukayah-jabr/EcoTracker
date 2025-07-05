@@ -4,7 +4,22 @@ def test_001_estimation_low(page: Page):
     
     # Open page
     page.goto("http://localhost:3000/")
-    page.get_by_role("link", name="Connect Data").click()
+    page.wait_for_load_state("networkidle")
+    connect_btn = page.get_by_role("link", name="Connect Data")
+    # Wait until it is not disabled
+    page.wait_for_function(
+        """(el) => !el.hasAttribute('disabled') && !el.getAttribute('aria-disabled')""",
+        connect_btn,
+        timeout=5000
+    )
+
+    page.screenshot(path="before_click_connect_data.png", full_page=True)
+
+
+    connect_btn.click()
+
+    page.wait_for_load_state("networkidle")
+
 
     # Take a screenshot of the 'Connect Data' page
     page.screenshot(path="connect_page.png", full_page=True)
@@ -15,6 +30,7 @@ def test_001_estimation_low(page: Page):
 
     # Move confidence slider to 0
     slider = page.locator(".v-slider")  # Adjust selector
+    slider.wait_for(state="visible")
 
     # Get the bounding box of the slider (for pixel positioning)
     box = slider.bounding_box()
