@@ -49,7 +49,14 @@ jobs:
         nohup python app.py &
 
     - name: Start backend (FastAPI)
-      run: nohup uvicorn eco_tracker.api:app --host 0.0.0.0 --port 8000 > backend.log 2>&1 &
+      run: |
+        export CLIMATIQ_API_KEY="${CLIMATIQ_API_KEY}"
+        export LLM_API_KEY="${LLM_API_KEY}"
+        export BREACT_API_KEY="${BREACT_API_KEY}"
+        export OPEN_ROUTE_SERVICE_API_KEY="${OPEN_ROUTE_SERVICE_API_KEY}"
+        export ODOO_API_KEY="${ODOO_API_KEY}"
+        export ODOO_PASSWORD="${ODOO_PASSWORD}"
+        nohup uvicorn eco_tracker.api:app --host 0.0.0.0 --port 8000 > backend.log 2>&1 &
       working-directory: ./ # optional
 
     - name: Wait for backend to start
