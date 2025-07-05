@@ -1,4 +1,3 @@
-// playwright.config.js
 const { defineConfig } = require('@playwright/test');
 
 module.exports = defineConfig({
@@ -7,11 +6,16 @@ module.exports = defineConfig({
   use: {
     baseURL: 'http://localhost:3000',
     headless: true,
-    launchOptions: {
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    },
     viewport: { width: 1280, height: 720 },
+    launchOptions: {
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    },
+
+    // Automatically take screenshot on failure
+    screenshot: 'only-on-failure',
+
   },
+
   webServer: {
     command: 'npm run dev --prefix frontend',
     url: 'http://localhost:3000',

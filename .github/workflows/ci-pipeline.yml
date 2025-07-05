@@ -57,7 +57,7 @@ jobs:
         export ODOO_API_KEY="${ODOO_API_KEY}"
         export ODOO_PASSWORD="${ODOO_PASSWORD}"
         nohup uvicorn eco_tracker.api:app --host 0.0.0.0 --port 8000 > backend.log 2>&1 &
-      working-directory: ./ # optional
+      working-directory: ./
 
     - name: Wait for backend to start
       run: |
@@ -95,13 +95,6 @@ jobs:
         curl -I http://localhost:8000
         echo "Odoo status:"
         curl -I http://localhost:8069
-    
-    
-
-#    - name: Install Playwright
-#      run: |
-#        npm install -D playwright
-#        npx playwright install
 
     - name: Install Playwright browsers
       run: npx playwright install
@@ -128,22 +121,14 @@ jobs:
     - name: Run test_full_pipeline (API)
       run: pytest eco_tracker/test/test_full_pipeline.py
 
-#    - name: Install Playwright
-#      run: |
-#        npm install -D playwright
-#        npx playwright install
-
     - name: Run Playwright UI tests (via pytest)
       env:
         DEBUG: "pw:api"
       run: pytest playwright-ui-tests/
 
-
-    - name: Upload screenshots if tests fail
+    - name: Upload Playwright test artifacts
       if: failure()
       uses: actions/upload-artifact@v4
       with:
         name: playwright-screenshots
-        path: connect_page.png
-
-
+        path: test-results/
